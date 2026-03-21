@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { WifiOff, RefreshCcw } from "lucide-react";
 import Link from "next/link";
 

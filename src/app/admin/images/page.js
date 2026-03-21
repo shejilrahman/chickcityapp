@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Search, Image as ImageIcon, CheckCircle2, Save, Upload, Trash2, Loader2, CheckSquare, Square, Users, MousePointer2, ClipboardPaste } from "lucide-react";
+import { Search, Image as ImageIcon, CheckCircle2, Save, Upload, Trash2, Loader2, CheckSquare, Square, Users, MousePointer2, ClipboardPaste, Globe, ArrowRight } from "lucide-react";
 import AdminNav from "@/components/AdminNav";
 
 export default function ImageAdminPage() {
@@ -15,6 +15,7 @@ export default function ImageAdminPage() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState(null);
   const [saveResults, setSaveResults] = useState(null);
+  const [googleSearchTerm, setGoogleSearchTerm] = useState("");
 
   const searchTimerRef = useRef(null);
   const RESULTS_CAP = 100;
@@ -142,6 +143,11 @@ export default function ImageAdminPage() {
     setCropRect({ x: (canvas.width - size) / 2, y: (canvas.height - size) / 2, w: size, h: size });
   };
 
+  const handleGoogleSearch = (term) => {
+    if(!term) return;
+    window.open(`https://www.google.com/search?q=${encodeURIComponent(term)}&tbm=isch`, "_blank");
+  };
+
   // GLOBAL PASTE LISTENER
   useEffect(() => {
     const handleGlobalPaste = (e) => {
@@ -158,11 +164,19 @@ export default function ImageAdminPage() {
     return () => window.removeEventListener("paste", handleGlobalPaste);
   }, [categories]); // dependencies keep it alive
 
-  const toggleSelect = (id) => {
+  const toggleSelect = (product) => {
     setSaveResults(null);
     setSelectedIds(prev => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id); else next.add(id);
+      if (next.has(product.id)) {
+        next.delete(product.id);
+      } else {
+        next.add(product.id);
+        // Pre-fill search term if it's the first one or we're adding to a small selection
+        if (next.size === 1) {
+          setGoogleSearchTerm(product.name);
+        }
+      }
       return next;
     });
   };
@@ -299,7 +313,7 @@ export default function ImageAdminPage() {
             </select>
 
             <div className="flex items-center justify-between pt-2">
-              <button onClick={() => selectedIds.size > 0 ? setSelectedIds(new Set()) : filteredProducts.forEach(x => toggleSelect(x.id))} 
+              <button onClick={() => selectedIds.size > 0 ? setSelectedIds(new Set()) : filteredProducts.forEach(x => toggleSelect(x))} 
                 className="text-xs font-bold text-slate-500 hover:text-blue-400 flex items-center gap-1.5 transition-colors">
                 {selectedIds.size > 0 ? <CheckSquare size={14} /> : <Square size={14} />}
                 {selectedIds.size > 0 ? "Deselect All" : "Select All Visible"}
@@ -314,34 +328,43 @@ export default function ImageAdminPage() {
               const ok = saveResults?.success.includes(p.id);
               const fail = saveResults?.failed.includes(p.id);
               return (
-                <button key={p.id} onClick={() => toggleSelect(p.id)} 
-                  className={`w-full text-left p-4 flex items-center gap-4 transition-all hover:bg-slate-800/40 relative
-                    ${sel ? "bg-blue-600/10 z-10" : ""}
-                    ${ok ? "bg-green-500/5" : ""}
-                    ${fail ? "bg-red-500/5" : ""}
-                  `}>
-                  {sel && <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500" />}
-                  <div className={`w-16 h-16 flex-shrink-0 rounded-xl bg-slate-950 border overflow-hidden transition-all shadow-lg
-                    ${sel ? "border-blue-500 ring-2 ring-blue-500/20" : "border-slate-800"}
-                  `}>
-                    {p.image 
-                      ? <img src={p.image} className="w-full h-full object-cover" alt="" />
-                      : <div className="w-full h-full flex items-center justify-center text-slate-800"><ImageIcon size={24} /></div>
-                    }
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className={`font-bold text-sm truncate ${sel ? "text-blue-400" : "text-slate-300"}`}>{p.name}</div>
-                    <div className="text-[10px] font-black text-slate-600 mt-0.5 uppercase tracking-tighter">{p.category}</div>
-                    <div className="flex items-center gap-2 mt-1.5">
-                      {p.image && <span className="text-[9px] font-bold bg-green-500/20 text-green-400 px-1.5 py-0.5 rounded uppercase">Image OK</span>}
-                      {ok && <span className="text-[9px] font-bold bg-blue-500 text-white px-1.5 py-0.5 rounded uppercase animate-bounce">Saved!</span>}
-                      {fail && <span className="text-[9px] font-bold bg-red-500 text-white px-1.5 py-0.5 rounded uppercase">Failed</span>}
+                <div key={p.id} className="group/item relative">
+                  <button onClick={() => toggleSelect(p)} 
+                    className={`w-full text-left p-4 flex items-center gap-4 transition-all hover:bg-slate-800/40 relative
+                      ${sel ? "bg-blue-600/10 z-10" : ""}
+                      ${ok ? "bg-green-500/5" : ""}
+                      ${fail ? "bg-red-500/5" : ""}
+                    `}>
+                    {sel && <div className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500" />}
+                    <div className={`w-16 h-16 flex-shrink-0 rounded-xl bg-slate-950 border overflow-hidden transition-all shadow-lg
+                      ${sel ? "border-blue-500 ring-2 ring-blue-500/20" : "border-slate-800"}
+                    `}>
+                      {p.image 
+                        ? <img src={p.image} className="w-full h-full object-cover" alt="" />
+                        : <div className="w-full h-full flex items-center justify-center text-slate-800"><ImageIcon size={24} /></div>
+                      }
                     </div>
-                  </div>
-                  <div className={`transition-all ${sel ? "text-blue-500 scale-110" : "text-slate-700"}`}>
-                    {sel ? <CheckSquare size={18} /> : <Square size={18} />}
-                  </div>
-                </button>
+                    <div className="flex-1 min-w-0">
+                      <div className={`font-bold text-sm truncate ${sel ? "text-blue-400" : "text-slate-300"}`}>{p.name}</div>
+                      <div className="text-[10px] font-black text-slate-600 mt-0.5 uppercase tracking-tighter">{p.category}</div>
+                      <div className="flex items-center gap-2 mt-1.5">
+                        {p.image && <span className="text-[9px] font-bold bg-green-500/20 text-green-400 px-1.5 py-0.5 rounded uppercase">Image OK</span>}
+                        {ok && <span className="text-[9px] font-bold bg-blue-500 text-white px-1.5 py-0.5 rounded uppercase animate-bounce">Saved!</span>}
+                        {fail && <span className="text-[9px] font-bold bg-red-500 text-white px-1.5 py-0.5 rounded uppercase">Failed</span>}
+                      </div>
+                    </div>
+                    <div className={`transition-all ${sel ? "text-blue-500 scale-110" : "text-slate-700"}`}>
+                      {sel ? <CheckSquare size={18} /> : <Square size={18} />}
+                    </div>
+                  </button>
+                  <button 
+                    onClick={(e) => { e.stopPropagation(); handleGoogleSearch(p.name); }}
+                    title="Search on Google Images"
+                    className="absolute right-12 top-1/2 -translate-y-1/2 p-2 bg-slate-950 border border-slate-800 rounded-lg text-slate-500 hover:text-blue-400 hover:border-blue-500/50 opacity-0 group-hover/item:opacity-100 transition-all z-20 shadow-xl"
+                  >
+                    <Globe size={14} />
+                  </button>
+                </div>
               );
             })}
           </div>
@@ -356,13 +379,35 @@ export default function ImageAdminPage() {
         {/* Main Workspace */}
         <div className="flex-1 flex flex-col bg-slate-950">
           <div className="h-16 bg-slate-900/50 backdrop-blur-xl border-b border-slate-800 flex items-center justify-between px-8 z-10">
-            <div className="flex items-center gap-4">
-              <div className="flex flex-col">
+            <div className="flex items-center gap-4 flex-1">
+              <div className="flex flex-col flex-shrink-0">
                 <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Image Workspace</span>
-                <span className="text-sm font-black text-white">
-                  {selectedIds.size === 0 ? "Select products to begin" : `${selectedIds.size} Target Selected`}
+                <span className="text-sm font-black text-white whitespace-nowrap">
+                   {selectedIds.size === 0 ? "Select products to begin" : `${selectedIds.size} Target Selected`}
                 </span>
               </div>
+
+              {selectedIds.size > 0 && (
+                <div className="flex items-center gap-2 bg-slate-950 border border-slate-800 rounded-xl px-2 py-1 ml-4 flex-1 max-w-md group focus-within:border-blue-500/50 transition-all">
+                  <div className="p-1 text-slate-500 group-focus-within:text-blue-500">
+                    <Globe size={14} />
+                  </div>
+                  <input 
+                    type="text" 
+                    value={googleSearchTerm} 
+                    onChange={e => setGoogleSearchTerm(e.target.value)}
+                    onKeyDown={e => e.key === "Enter" && handleGoogleSearch(googleSearchTerm)}
+                    className="bg-transparent border-none outline-none text-xs font-bold text-slate-300 w-full placeholder:text-slate-600"
+                    placeholder="Edit search term..."
+                  />
+                  <button 
+                    onClick={() => handleGoogleSearch(googleSearchTerm)}
+                    className="p-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors"
+                  >
+                    <ArrowRight size={12} />
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className="flex items-center gap-3">
@@ -398,7 +443,7 @@ export default function ImageAdminPage() {
                 </div>
                 <h3 className="text-xl font-black mb-2">Ready to Paste</h3>
                 <p className="text-slate-500 text-sm leading-relaxed mb-6">
-                  Screenshot an image from any website and press <kbd className="bg-slate-800 px-2 py-1 rounded text-white text-xs mx-1">Ctrl + V</kbd> anywhere to start cropping.
+                  Select a product to search on Google. Copy an image from results and press <kbd className="bg-slate-800 px-2 py-1 rounded text-white text-xs mx-1">Ctrl + V</kbd> to paste.
                 </p>
                 <div className="grid grid-cols-2 gap-3 w-full">
                    <div className="bg-slate-900 p-3 rounded-2xl border border-slate-800">
@@ -406,8 +451,8 @@ export default function ImageAdminPage() {
                       <p className="text-[10px] font-bold uppercase text-slate-400">Select Targets</p>
                    </div>
                    <div className="bg-slate-900 p-3 rounded-2xl border border-slate-800">
-                      <Save size={16} className="text-green-500 mb-2" />
-                      <p className="text-[10px] font-bold uppercase text-slate-400">Bulk Apply</p>
+                      <Globe size={16} className="text-green-500 mb-2" />
+                      <p className="text-[10px] font-bold uppercase text-slate-400">Google Search</p>
                    </div>
                 </div>
               </div>

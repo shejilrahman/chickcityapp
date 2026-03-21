@@ -17,7 +17,7 @@ export default function ProductListItem({ product }) {
     : product.price;
 
   const unitLabel = slab
-    ? (selectedGrams ? formatGrams(selectedGrams) : "per kg")
+    ? (selectedGrams ? formatGrams(selectedGrams) : "Full Portion")
     : product.unit;
 
   return (

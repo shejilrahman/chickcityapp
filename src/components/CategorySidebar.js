@@ -1,16 +1,15 @@
 "use client";
 
 const categoryEmoji = {
-  "All":               "🛒",
-  "GROCERY":           "🌾",
-  "OILS":              "🫙",
+  "All":               "🍗",
+  "MANDI":             "🍚",
+  "CHICKEN":           "🍗",
+  "BIRTHDAY CAKES":     "🎂",
   "BEVERAGES":         "🥤",
-  "INSTANT FOOD":      "🍜",
-  "TOILETRIES":        "🧴",
-  "DISINFECTANTS":     "🧹",
-  "MEDICAL PRODUCTS":  "💊",
-  "VEGETABLES":        "🥦",
-  "STATIONERY":        "✏️",
+  "DESSERTS":          "🍨",
+  "SNAKCS":            "🍟",
+  "VEG ITEMS":        "🥗",
+  "CHINESE":           "🍜",
 };
 
 export default function CategorySidebar({ categories, selectedCategory, setSelectedCategory }) {

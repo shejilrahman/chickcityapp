@@ -151,7 +151,7 @@ export default function WeightSlabAdminPage() {
           <div className="p-4 border-b border-slate-800">
             <h2 className="text-lg font-bold mb-3 flex items-center gap-2">
               <Scale size={18} className="text-blue-400" />
-              Weight Slabs
+              Portion Slabs
             </h2>
 
             {/* Search */}
@@ -304,7 +304,7 @@ export default function WeightSlabAdminPage() {
                     <div className="text-2xl font-black mb-1">{slab.shortLabel}</div>
                     <div className="text-sm font-semibold mb-1">{slab.label}</div>
                     <div className="text-xs opacity-70">
-                      Min: {slab.min}g · Max: {slab.max}g · Step: {slab.step}g
+                      Min: {slab.min} · Max: {slab.max} · Step: {slab.step}
                     </div>
                     <div className={`text-xs mt-2 ${isActive ? "opacity-80" : "opacity-50"}`}>
                       e.g. {slab.example}
@@ -335,13 +335,13 @@ export default function WeightSlabAdminPage() {
                 <p className="text-sm text-slate-300">
                   Selected <span className="font-bold text-white">{selectedIds.size}</span> product{selectedIds.size > 1 ? "s" : ""} will sell in{" "}
                   <span className={`font-bold ${SLAB_COLORS[WEIGHT_SLABS[pendingSlab].color].text}`}>
-                    {WEIGHT_SLABS[pendingSlab].step} g
+                    {WEIGHT_SLABS[pendingSlab].step}
                   </span>{" "}
                   increments.
                 </p>
                 <p className="text-xs text-slate-500 mt-1">
-                  Customers can pick {WEIGHT_SLABS[pendingSlab].min}g →{" "}
-                  {WEIGHT_SLABS[pendingSlab].max}g. Price auto-calculated from the base price per kg.
+                  Customers can pick {WEIGHT_SLABS[pendingSlab].min} →{" "}
+                  {WEIGHT_SLABS[pendingSlab].max}. Price auto-calculated from the base price.
                 </p>
               </div>
             )}

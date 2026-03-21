@@ -1,8 +1,8 @@
 export const generateWhatsAppMessage = (items, total, name, phone, location) => {
   const number = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "8891930562";
-  const shopName = process.env.NEXT_PUBLIC_SHOP_NAME || "Palathingal Stores";
+  const shopName = process.env.NEXT_PUBLIC_SHOP_NAME || "Chick City Restaurant";
 
-  let message = `🛒 *New Order*\n\n`;
+  let message = `🍗 *New Order - ${shopName}*\n\n`;
 
   items.forEach(item => {
     // Assuming each item has: name, unit, price, and quantity

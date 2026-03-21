@@ -14,10 +14,10 @@ const PAGE_SIZE = 40;
 
 /* ── Delivery promise badges shown in the hero ── */
 const PROMISES = [
-  { emoji: "🕐", text: "4-5 hr delivery" },
-  { emoji: "📍", text: "3 km range" },
-  { emoji: "🏪", text: "Local store" },
-  { emoji: "🌿", text: "Fresh daily" },
+  { emoji: "🚀", text: "30-45 min delivery" },
+  { emoji: "📍", text: "5 km range" },
+  { emoji: "🍗", text: "Hot & Fresh" },
+  { emoji: "✨", text: "Best Quality" },
 ];
 
 export default function Home() {
@@ -172,18 +172,18 @@ export default function Home() {
             <div className="flex items-center gap-3">
               {/* Store icon */}
               <div className="w-11 h-11 bg-white/20 backdrop-blur-sm border border-white/30 rounded-2xl flex items-center justify-center shadow-lg">
-                <span className="text-2xl">🛒</span>
+                <span className="text-2xl">🍗</span>
               </div>
 
               <div>
                 <div className="flex items-center gap-1.5">
                   <h1 className="text-white font-black text-[19px] tracking-tight leading-none">
-                    Palathingal
+                    Chick City
                   </h1>
                   {/* Verified-store badge like Zepto */}
                   <span className="bg-white/25 border border-white/30 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5">
                     <Sparkles size={9} strokeWidth={2.5} />
-                    Stores
+                    Restaurant
                   </span>
                 </div>
                 <p className="text-emerald-200 text-[11.5px] font-medium mt-0.5 tracking-wide">
@@ -214,7 +214,7 @@ export default function Home() {
             ))}
             {/* Minimum order badge */}
             <div className="flex items-center gap-1 bg-yellow-300/20 border border-yellow-300/40 rounded-full px-2.5 py-1">
-              <span className="text-[13px]">🛒</span>
+              <span className="text-[13px]">🥡</span>
               <span className="text-yellow-200 text-[11px] font-semibold">Min. order ₹300</span>
             </div>
           </div>

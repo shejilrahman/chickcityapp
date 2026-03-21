@@ -29,6 +29,16 @@ const ADMIN_PAGES = [
     text: "text-green-700",
   },
   {
+    href: "/admin/edit",
+    icon: Star, // Temporary, will change if needed
+    label: "Edit Products",
+    desc: "Update name, price, and MRP of items",
+    color: "from-orange-500 to-red-600",
+    bg: "bg-orange-50",
+    border: "border-orange-100",
+    text: "text-orange-700",
+  },
+  {
     href: "/admin/featured",
     icon: Star,
     label: "Featured Products",
@@ -111,7 +121,7 @@ export default function AdminIndexPage() {
             </div>
             <div>
               <h1 className="font-black text-lg tracking-tight leading-none">Admin Panel</h1>
-              <p className="text-slate-500 text-[11px] mt-0.5">Palathingal Stores</p>
+              <p className="text-slate-500 text-[11px] mt-0.5">Chick City Restaurant</p>
             </div>
           </div>
           <button

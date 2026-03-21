@@ -1,13 +1,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Image as ImageIcon, FolderOpen, Star, Scale, EyeOff, LayoutDashboard } from "lucide-react";
+import { Image as ImageIcon, FolderOpen, Star, Scale, EyeOff, LayoutDashboard, Edit3 } from "lucide-react";
 
 const links = [
   { href: "/admin",              icon: LayoutDashboard, label: "Home" },
+  { href: "/admin/edit",         icon: Edit3,           label: "Edit Info" },
   { href: "/admin/images",       icon: ImageIcon,       label: "Images" },
   { href: "/admin/categories",   icon: FolderOpen,      label: "Categories" },
   { href: "/admin/featured",     icon: Star,            label: "Featured" },
-  { href: "/admin/weight-slabs", icon: Scale,           label: "Weight Slabs" },
+  { href: "/admin/weight-slabs", icon: Scale,           label: "Slabs" },
   { href: "/admin/hidden",       icon: EyeOff,          label: "Hidden" },
 ];
 

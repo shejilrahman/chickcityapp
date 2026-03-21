@@ -1,57 +1,34 @@
 /**
- * Weight Slab Definitions
+ * Portion Slab Definitions (formerly Weight Slabs)
  *
- * Each slab defines how a product is sold in gram increments.
- * Products without a weightSlab field behave as before (unit-based).
- *
- * baseUnit: how many grams = 1 unit in the product's price
- *   (almost always 1000 g, i.e., the product price is "per kg")
+ * Each slab defines how a product is sold in portions (Qtr, Half, Full).
+ * For a restaurant, portions are based on a base price (e.g., Full price).
+ * 
+ * baseUnit: conceptually 1.0 (Full)
  */
 
 export const WEIGHT_SLABS = {
-  slab_10g: {
-    key: "slab_10g",
-    label: "10 g steps",
-    shortLabel: "10g",
-    step: 10,      // grams per step
-    min: 10,       // minimum grams
-    max: 200,      // maximum grams
-    baseUnit: 1000, // price is per this many grams (1 kg)
+  slab_portions: {
+    key: "slab_portions",
+    label: "Standard Portions",
+    shortLabel: "Q/H/F",
+    step: 0.25,      // portion step
+    min: 0.25,       // Qtr
+    max: 1.0,        // Full
+    baseUnit: 1.0,   // price is per 1.0 (Full)
     color: "purple",
-    example: "Saffron, rare spices",
+    example: "Chicken, Mandi, Biryani",
   },
-  slab_100g: {
-    key: "slab_100g",
-    label: "100 g steps",
-    shortLabel: "100g",
-    step: 100,
-    min: 100,
-    max: 1000,
-    baseUnit: 1000,
+  slab_family: {
+    key: "slab_family",
+    label: "Family Portions",
+    shortLabel: "F/XL",
+    step: 0.5,
+    min: 1.0,
+    max: 2.0,
+    baseUnit: 1.0,
     color: "orange",
-    example: "Chilli, pepper, coriander",
-  },
-  slab_250g: {
-    key: "slab_250g",
-    label: "250 g steps",
-    shortLabel: "250g",
-    step: 250,
-    min: 250,
-    max: 2000,
-    baseUnit: 1000,
-    color: "green",
-    example: "Tomato, onion",
-  },
-  slab_500g: {
-    key: "slab_500g",
-    label: "500 g steps",
-    shortLabel: "500g",
-    step: 500,
-    min: 500,
-    max: 5000,
-    baseUnit: 1000,
-    color: "blue",
-    example: "Rice, dal, flour",
+    example: "Family Buckets, Platters",
   },
 };
 
@@ -59,21 +36,24 @@ export const SLAB_LIST = Object.values(WEIGHT_SLABS);
 
 /**
  * Get the effective price for a slab product.
- * @param {number} basePrice - product.price (price per baseUnit grams)
- * @param {number} selectedGrams - how many grams the customer selected
- * @param {number} baseUnit - grams in one unit (default 1000)
+ * @param {number} basePrice - product.price (price per baseUnit)
+ * @param {number} selectedValue - portion value (0.25, 0.5, 1.0, etc.)
+ * @param {number} baseUnit - default 1.0
  * @returns {number} price rounded to 2 decimal places
  */
-export function getSlabPrice(basePrice, selectedGrams, baseUnit = 1000) {
-  return Math.round((basePrice / baseUnit) * selectedGrams * 100) / 100;
+export function getSlabPrice(basePrice, selectedValue, baseUnit = 1.0) {
+  return Math.round((basePrice / baseUnit) * selectedValue * 100) / 100;
 }
 
 /**
- * Format grams nicely: 1000g → "1 kg", 500g → "500 g"
+ * Format portions nicely: 0.25 → "Qtr", 0.5 → "Half", 1.0 → "Full"
  */
-export function formatGrams(grams) {
-  if (grams >= 1000 && grams % 1000 === 0) {
-    return `${grams / 1000} kg`;
-  }
-  return `${grams} g`;
+export function formatGrams(value) {
+  if (value === 0.25) return "Qtr";
+  if (value === 0.5) return "Half";
+  if (value === 1.0) return "Full";
+  if (value === 1.5) return "1.5 Full";
+  if (value === 2.0) return "Double / XL";
+  return `${value} Portion`;
 }
+

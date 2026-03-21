@@ -74,7 +74,7 @@ export default function AdminDashboard() {
 
   const showNotification = (msg) => {
     if ("Notification" in window && Notification.permission === "granted") {
-      new Notification("Palathingal Stores", { body: msg, icon: "/icons/icon-192.png" });
+      new Notification("Chick City", { body: msg, icon: "/icons/icon-192.png" });
     }
   };
 

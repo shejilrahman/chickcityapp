@@ -105,7 +105,7 @@ export default function CartPage() {
         </div>
         <h2 className="text-2xl font-black text-gray-800 mb-2">Cart is empty</h2>
         <p className="text-gray-400 mb-8 max-w-xs text-sm">
-          Add some groceries to your cart and come back here to checkout.
+          Add some delicious items to your cart and come back here to checkout.
         </p>
         <button
           onClick={() => router.push("/")}
@@ -144,7 +144,6 @@ export default function CartPage() {
               ? getSlabPrice(item.price, item.selectedGrams, slab.baseUnit)
               : item.price;
             const lineTotal = effectivePrice * (slab ? 1 : item.quantity);
-            const displayQty = slab ? formatGrams(item.selectedGrams) : item.quantity;
             const unitLabel = slab ? formatGrams(item.selectedGrams) : `₹${item.price} / ${item.unit}`;
 
             return (
@@ -192,7 +191,7 @@ export default function CartPage() {
               {/* Line Total */}
               <div className="text-right flex-shrink-0">
                 <p className="font-black text-[17px] text-gray-900">₹{lineTotal.toFixed(2)}</p>
-                {slab && <p className="text-[10px] text-gray-400">@ ₹{item.price}/kg</p>}
+                {slab && <p className="text-[10px] text-gray-400">@ ₹{item.price} (Full)</p>}
               </div>
             </div>
           );

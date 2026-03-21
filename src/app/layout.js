@@ -15,13 +15,13 @@ export const viewport = {
 };
 
 export const metadata = {
-  title: "Palathingal Stores App",
-  description: "Order fresh groceries via WhatsApp",
+  title: "Chick City Restaurant App",
+  description: "Order hot & fresh food via WhatsApp",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Palathingal Stores",
+    title: "Chick City",
   },
 };
 

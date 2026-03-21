@@ -13,7 +13,7 @@ export default function SearchBar({ searchTerm, setSearchTerm }) {
         inputMode="search"
         enterKeyHint="search"
         className="block w-full pl-11 pr-10 py-3.5 bg-white border-0 rounded-2xl text-gray-900 text-[15px] placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-400 shadow-md transition-all"
-        placeholder="Search groceries, spices…"
+        placeholder="Search for delicious food…"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />

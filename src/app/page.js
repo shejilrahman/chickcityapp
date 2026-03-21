@@ -9,9 +9,8 @@ import CartDrawer from "@/components/CartDrawer";
 import { Clock, Loader2, Sparkles } from "lucide-react";
 import Fuse from "fuse.js";
 import Link from "next/link";
-import SplashScreen from "@/components/SplashScreen";
 
-const PAGE_SIZE = 40;
+const PAGE_SIZE = 20; // Start small for fast first paint; infinite scroll loads more
 
 /* ── Delivery promise badges shown in the hero ── */
 const PROMISES = [
@@ -30,7 +29,6 @@ export default function Home() {
   const [pastItems, setPastItems] = useState([]);
   const [isHydrated, setIsHydrated] = useState(false);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
-  const [isSplashComplete, setIsSplashComplete] = useState(false);
 
   const loaderRef  = useRef(null);
   const contentRef = useRef(null);
@@ -138,14 +136,12 @@ export default function Home() {
   const pastProducts    = allProducts.filter(p => pastItems.includes(p.id)).slice(0, 8);
   const isSearching     = !!searchTerm.trim();
 
-  /* ─── Splash screen transition ─── */
-  if (!isHydrated || !productsLoaded || !isSplashComplete) {
-    return <SplashScreen onDone={() => setIsSplashComplete(true)} />;
-  }
+  /* ─── Loading state — wait for hydration and data ─── */
+  if (!isHydrated || !productsLoaded) return null;
 
   /* ─── Full page ─── */
   return (
-    <div className="h-screen flex flex-col overflow-hidden animate-in fade-in duration-700" style={{ background: "#f0faf4" }}>
+    <div className="h-screen flex flex-col overflow-hidden" style={{ background: "#f0faf4" }}>
 
       {/* ══════════════════════════════════════════
           STICKY HEADER  

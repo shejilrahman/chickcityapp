@@ -1,138 +1,123 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 
-/**
- * SplashScreen — shown once on first app open.
- * Fades out after ~2.2 s and is never shown again during the session.
- */
 export default function SplashScreen({ onDone }) {
-  // Phase: "enter" → "hold" → "exit"
-  const [phase, setPhase] = useState("enter");
+  const [isFlickerBrand, setIsFlickerBrand] = useState(false);
+  const [isFlickerSub, setIsFlickerSub] = useState(false);
+  const [showOtherElements, setShowOtherElements] = useState(false);
+  const [loadPercent, setLoadPercent] = useState(0);
 
   useEffect(() => {
-    // Start logo animation
-    const holdTimer = setTimeout(() => setPhase("exit"), 2000);
-    // Remove splash from DOM after fade-out completes
-    const doneTimer = setTimeout(() => onDone?.(), 2600);
+    // 1. Loading bar progress
+    const loadInterval = setInterval(() => {
+      setLoadPercent(prev => {
+        if (prev >= 100) {
+          clearInterval(loadInterval);
+          return 100;
+        }
+        return prev + 1;
+      });
+    }, 30);
+
+    // 2. Animation sequence
+    const timer1 = setTimeout(() => setIsFlickerBrand(true), 800);
+    const timer2 = setTimeout(() => setIsFlickerSub(true), 1400); // 800 + 600
+    const timer3 = setTimeout(() => setShowOtherElements(true), 1600);
+    
+    // 3. Complete splash after 4.5 seconds
+    const timerComplete = setTimeout(() => onDone?.(), 4500);
+
     return () => {
-      clearTimeout(holdTimer);
-      clearTimeout(doneTimer);
+      clearInterval(loadInterval);
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      clearTimeout(timer3);
+      clearTimeout(timerComplete);
     };
   }, [onDone]);
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 9999,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        background: "linear-gradient(160deg, #7c2d12 0%, #9a3412 35%, #c2410c 65%, #ea580c 100%)",
-        transition: phase === "exit" ? "opacity 0.55s ease, transform 0.55s ease" : "none",
-        opacity: phase === "exit" ? 0 : 1,
-        transform: phase === "exit" ? "scale(1.04)" : "scale(1)",
-        pointerEvents: phase === "exit" ? "none" : "auto",
-      }}
-    >
-      {/* Background decorative circles */}
-      <div style={{
-        position: "absolute", top: "-80px", right: "-80px",
-        width: "320px", height: "320px", borderRadius: "50%",
-        background: "rgba(255,255,255,0.06)",
-      }} />
-      <div style={{
-        position: "absolute", bottom: "-60px", left: "-60px",
-        width: "240px", height: "240px", borderRadius: "50%",
-        background: "rgba(255,255,255,0.05)",
-      }} />
+    <div className="fixed inset-0 z-[9999] bg-[#0a0a0a] flex items-center justify-center overflow-hidden font-serif">
+      {/* Dark bg structure */}
+      <div className="absolute inset-0 opacity-[0.05]" style={{ background: "repeating-linear-gradient(90deg,transparent,transparent 59px,rgba(255,255,255,0.012) 60px)" }} />
+      
+      {/* Glow blooms */}
+      <div className={`absolute top-[-60px] left-1/2 -translate-x-1/2 w-[340px] h-[280px] transition-all duration-[1200ms] pointer-events-none
+        ${isFlickerBrand ? "bg-[radial-gradient(ellipse,rgba(220,30,30,0.22)_0%,transparent_70%)]" : "bg-transparent"}
+      `} />
+      <div className={`absolute bottom-[-20px] left-1/2 -translate-x-1/2 w-[300px] h-[200px] transition-all duration-[1400ms] pointer-events-none
+        ${showOtherElements ? "bg-[radial-gradient(ellipse,rgba(180,90,20,0.13)_0%,transparent_70%)]" : "bg-transparent"}
+      `} />
 
-      {/* Main content */}
-      <div style={{
-        display: "flex", flexDirection: "column", alignItems: "center",
-        animation: "splashSlideUp 0.55s cubic-bezier(.22,.68,0,1.2) both",
-      }}>
-        {/* Logo icon */}
-        <div style={{
-          width: "110px", height: "110px", borderRadius: "32px",
-          background: "rgba(255,255,255,0.15)",
-          backdropFilter: "blur(12px)",
-          border: "1.5px solid rgba(255,255,255,0.28)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: "52px",
-          boxShadow: "0 16px 48px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.25)",
-          marginBottom: "28px",
-        }}>
-          🍗
+      <div className="relative z-10 flex flex-col items-center">
+        {/* Bird Logo SVG */}
+        <div className={`mb-[22px] transition-opacity duration-700 ${showOtherElements ? "opacity-100" : "opacity-0"}`}>
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+            <ellipse cx="40" cy="48" rx="20" ry="16" fill="#cc2a1a"/>
+            <circle cx="40" cy="26" r="12" fill="#cc2a1a"/>
+            <polygon points="40,30 48,33 40,36" fill="#e8a020"/>
+            <path d="M34 16 Q36 10 38 16 Q40 9 42 16 Q44 10 46 16" stroke="#e8a020" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <circle cx="44" cy="24" r="2.5" fill="#fff"/>
+            <circle cx="44.8" cy="24" r="1.2" fill="#111"/>
+            <path d="M22 46 Q18 40 24 36 Q30 42 28 50 Z" fill="#b02010"/>
+            <path d="M58 44 Q66 38 64 50 Q60 52 56 50 Z" fill="#b02010"/>
+            <line x1="34" y1="63" x2="30" y2="74" stroke="#e8a020" stroke-width="3" stroke-linecap="round"/>
+            <line x1="46" y1="63" x2="50" y2="74" stroke="#e8a020" stroke-width="3" stroke-linecap="round"/>
+            <line x1="30" y1="74" x2="25" y2="74" stroke="#e8a020" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="50" y1="74" x2="55" y2="74" stroke="#e8a020" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
         </div>
 
-        {/* Store name */}
-        <h1 style={{
-          color: "#fff",
-          fontSize: "42px",
-          fontWeight: "950",
-          letterSpacing: "-1.5px",
-          lineHeight: 1,
-          marginBottom: "8px",
-          textShadow: "0 4px 16px rgba(0,0,0,0.25)",
-          textTransform: "uppercase",
-        }}>
-          Chick City
-        </h1>
+        {/* Brand Name with flicker animation */}
+        <div className="text-center">
+          <h1 className={`m-0 text-[44px] font-[800] tracking-[3px] leading-none transition-all duration-300
+            ${isFlickerBrand 
+              ? "text-[#e8281a] [text-shadow:0_0_8px_#e8281a,0_0_20px_#e8281a,0_0_40px_rgba(232,40,26,0.6)] animate-[flicker_0.6s_ease_forwards]" 
+              : "text-[#1a0a0a]"}
+          `}>
+            Chick City
+          </h1>
 
-        {/* "Restaurant" badge */}
-        <div style={{
-          display: "inline-flex", alignItems: "center", gap: "6px",
-          background: "rgba(255,255,255,0.18)",
-          border: "1px solid rgba(255,255,255,0.28)",
-          borderRadius: "20px",
-          padding: "4px 16px",
-          marginBottom: "20px",
-        }}>
-          <span style={{ fontSize: "14px" }}>⭐</span>
-          <span style={{ color: "#fff", fontSize: "14px", fontWeight: "800", letterSpacing: "1px" }}>
-            RESTAURANT
-          </span>
+          <div className={`flex items-center justify-center gap-[6px] my-[8px] transition-opacity duration-800 ${showOtherElements ? "opacity-100" : "opacity-0"}`}>
+            <div className="w-[50px] h-[1px]" style={{ background: "linear-gradient(to left,#e8281a,transparent)" }} />
+            <div className="w-1.5 h-1.5 bg-[#e8281a] rounded-full shadow-[0_0_8px_#e8281a]" />
+            <div className="w-[50px] h-[1px]" style={{ background: "linear-gradient(to right,#e8281a,transparent)" }} />
+          </div>
+
+          <p className={`m-0 text-[11px] tracking-[5px] uppercase font-[400] transition-all duration-300
+            ${isFlickerSub 
+              ? "text-white [text-shadow:0_0_6px_#fff,0_0_14px_rgba(255,255,255,0.5)] animate-[flicker_0.7s_ease_forwards]" 
+              : "text-[#0a0a0a]"}
+          `}>
+            Family Restaurant
+          </p>
         </div>
 
-        {/* Tagline */}
-        <p style={{
-          color: "rgba(255,255,255,0.85)",
-          fontSize: "15px",
-          fontWeight: "600",
-          letterSpacing: "0.5px",
-        }}>
-          Original Arabic Mandi & Grills
-        </p>
+        {/* Tagline Badge */}
+        <div className={`mt-[36px] bg-[rgba(232,73,58,0.1)] border border-[rgba(232,73,58,0.25)] rounded-full px-[20px] py-[8px] flex items-center gap-[8px] transition-opacity duration-1000
+          ${showOtherElements ? "opacity-100" : "opacity-0"}
+        `}>
+          <div className="w-[6px] h-[6px] bg-[#e8281a] rounded-full shadow-[0_0_5px_#e8281a]" />
+          <p className="m-0 text-[11px] text-[#e8a090] tracking-[2px] uppercase">Al Fahm · Mandi · Grills</p>
+          <div className="w-[6px] h-[6px] bg-[#e8281a] rounded-full shadow-[0_0_5px_#e8281a]" />
+        </div>
 
+        {/* Loading bar footer */}
+        <div className="absolute bottom-[80px] w-[130px] h-[2px] bg-[#1e1e1e] rounded-full overflow-hidden">
+          <div className="h-full bg-[#e8281a] transition-all duration-300" style={{ width: `${loadPercent}%` }} />
+        </div>
+        <p className="absolute bottom-[56px] text-[10px] text-[#333] tracking-[3px] uppercase">Welcome</p>
       </div>
 
-      {/* Loading dots at the bottom */}
-      <div style={{
-        position: "absolute", bottom: "60px",
-        display: "flex", gap: "8px", alignItems: "center",
-      }}>
-        {[0, 1, 2].map((i) => (
-          <div key={i} style={{
-            width: "7px", height: "7px", borderRadius: "50%",
-            background: "rgba(255,255,255,0.55)",
-            animation: `splashDot 1s ${i * 0.18}s ease-in-out infinite alternate`,
-          }} />
-        ))}
-      </div>
-
-      {/* Keyframe animations injected inline */}
-      <style>{`
-        @keyframes splashSlideUp {
-          from { opacity: 0; transform: translateY(24px) scale(0.95); }
-          to   { opacity: 1; transform: translateY(0)    scale(1); }
-        }
-        @keyframes splashDot {
-          from { opacity: 0.3; transform: translateY(0); }
-          to   { opacity: 1;   transform: translateY(-5px); }
+      <style jsx global>{`
+        @keyframes flicker {
+          0%   { opacity:1; color: #1a0a0a; text-shadow: none; }
+          5%   { opacity:0.2; color: #e8281a; text-shadow: 0 0 8px #e8281a; }
+          10%  { opacity:1; color: #e8281a; text-shadow: 0 0 20px #e8281a; }
+          15%  { opacity:0.5; color: #3a0a0a; text-shadow: none; }
+          20%  { opacity:1; color: #e8281a; text-shadow: 0 0 8px #e8281a; }
+          100% { opacity:1; color: #e8281a; text-shadow: 0 0 20px #e8281a, 0 0 40px rgba(232,40,26,0.6); }
         }
       `}</style>
     </div>

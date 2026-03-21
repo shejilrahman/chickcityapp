@@ -1,0 +1,85 @@
+﻿
+> grocery-pwa@0.1.0 build
+> next build
+
+  Γû▓ Next.js 14.2.35
+  - Environments: .env.local
+
+   Creating an optimized production build ...
+> [PWA] Compile server
+> [PWA] Compile server
+> [PWA] Compile client (static)
+> [PWA] Auto register service worker with: F:\palathingalstore\grocery-pwa\node_modules\next-pwa\register.js
+> [PWA] Service worker: F:\palathingalstore\grocery-pwa\public\sw.js
+> [PWA]   url: /sw.js
+> [PWA]   scope: /
+ Γ£ô Compiled successfully
+   Linting and checking validity of types ...
+node.exe : 
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo 
+...
++ ~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~
+~~
+    + CategoryInfo     
+         : NotSpecifi  
+  ed: (:String) [],    
+ RemoteException
+    + FullyQualifiedEr 
+   rorId : NativeComm  
+  andError
+ 
+Failed to compile.
+
+./src/app/cart/page.js
+64:31  Error: `'` can 
+be escaped with 
+`&apos;`, `&lsquo;`, 
+`&#39;`, `&rsquo;`.  re
+act/no-unescaped-entiti
+es
+97:16  Warning: Using 
+`<img>` could result 
+in slower LCP and 
+higher bandwidth. 
+Consider using `<Image 
+/>` from `next/image` 
+to automatically 
+optimize images. This 
+may incur additional 
+usage or cost from 
+your provider. See: htt
+ps://nextjs.org/docs/me
+ssages/no-img-element  
+@next/next/no-img-eleme
+nt
+
+./src/components/Produc
+tCard.js
+20:11  Warning: Using 
+`<img>` could result 
+in slower LCP and 
+higher bandwidth. 
+Consider using `<Image 
+/>` from `next/image` 
+to automatically 
+optimize images. This 
+may incur additional 
+usage or cost from 
+your provider. See: htt
+ps://nextjs.org/docs/me
+ssages/no-img-element  
+@next/next/no-img-eleme
+nt
+
+info  - Need to 
+disable some ESLint 
+rules? Learn more 
+here: https://nextjs.or
+g/docs/basic-features/e
+slint#disabling-rules

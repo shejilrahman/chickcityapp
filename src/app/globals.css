@@ -1,0 +1,90 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+@layer base {
+  :root {
+    /* Purple theme tokens */
+    --brand:        270 80% 50%;   /* #7c22eb */
+    --brand-light:  270 100% 97%;  /* #f5eeff */
+    --brand-mid:    270 65% 90%;   /* #dac7f7 */
+    --brand-dark:   270 80% 38%;   /* #5c11b5 */
+
+    /* Pastel surface palette */
+    --bg-page:      260 40% 97%;   /* #f3f0fc — faint lavender */
+    --bg-card:      0 0% 100%;
+    --bg-sidebar:   260 30% 94%;   /* #e8e2f7 */
+  }
+
+  body {
+    @apply antialiased;
+    font-family: 'Inter', var(--font-inter), var(--font-manjari), sans-serif;
+    background-color: hsl(var(--bg-page));
+    -webkit-tap-highlight-color: transparent;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@layer utilities {
+  /* ── Scrollbar helpers ── */
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .hide-scrollbar::-webkit-scrollbar { display: none; }
+
+  /* ── Safe area ── */
+  .safe-bottom { padding-bottom: max(1.5rem, env(safe-area-inset-bottom)); }
+  .safe-top    { padding-top: max(0px, env(safe-area-inset-top)); }
+
+  .text-balance { text-wrap: balance; }
+
+  /* ── Glass surface ── */
+  .glass {
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    background: rgba(255, 255, 255, 0.88);
+  }
+
+  /* ── Purple glass header ── */
+  .header-glass {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.96);
+    border-bottom: 1px solid rgba(124, 34, 235, 0.10);
+  }
+
+  /* ── Brand gradient ── */
+  .brand-gradient {
+    background: linear-gradient(135deg, #7c22eb 0%, #a855f7 50%, #c084fc 100%);
+  }
+
+  /* ── Shimmer pulse used in skeleton ── */
+  @keyframes shimmer {
+    0%   { background-position: -400px 0; }
+    100% { background-position: 400px 0; }
+  }
+  .shimmer {
+    background: linear-gradient(90deg, #ede8f7 25%, #d8d0f0 50%, #ede8f7 75%);
+    background-size: 800px 100%;
+    animation: shimmer 1.4s infinite linear;
+  }
+
+  /* ── Hero blob animations ── */
+  @keyframes blob-drift {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33%       { transform: translate(12px, -10px) scale(1.05); }
+    66%       { transform: translate(-8px, 8px) scale(0.97); }
+  }
+  .blob { animation: blob-drift 8s ease-in-out infinite; }
+  .blob-delay { animation-delay: 3s; }
+
+  /* ── Soft card shadow ── */
+  .card-shadow { box-shadow: 0 2px 12px rgba(124, 34, 235, 0.08); }
+}

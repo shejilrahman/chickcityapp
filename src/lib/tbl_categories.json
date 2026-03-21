@@ -1,0 +1,66 @@
+{
+"tbl_categories": [
+	{
+		"id" : 2,
+		"title" : "GROCERY",
+		"description" : "",
+		"added_date" : "2021-07-21T12:38:18.700Z",
+		"added_by" : 7
+	},
+	{
+		"id" : 4,
+		"title" : "STATIONERY",
+		"description" : "",
+		"added_date" : "2021-07-21T12:39:20.807Z",
+		"added_by" : 7
+	},
+	{
+		"id" : 5,
+		"title" : "BEVERAGES",
+		"description" : "",
+		"added_date" : "2021-07-21T12:39:27.677Z",
+		"added_by" : 7
+	},
+	{
+		"id" : 6,
+		"title" : "INSTANT FOOD",
+		"description" : "",
+		"added_date" : "2021-07-25T05:54:41.437Z",
+		"added_by" : 7
+	},
+	{
+		"id" : 7,
+		"title" : "TOILETRIES",
+		"description" : "",
+		"added_date" : "2021-07-25T05:59:37.660Z",
+		"added_by" : 7
+	},
+	{
+		"id" : 8,
+		"title" : "DISINFECTANTS",
+		"description" : "",
+		"added_date" : "2021-07-25T06:08:34.060Z",
+		"added_by" : 7
+	},
+	{
+		"id" : 9,
+		"title" : "OILS",
+		"description" : "",
+		"added_date" : "2021-07-25T06:19:54.863Z",
+		"added_by" : 7
+	},
+	{
+		"id" : 10,
+		"title" : "MEDICAL PRODUCTS",
+		"description" : "",
+		"added_date" : "2021-07-27T10:10:09.697Z",
+		"added_by" : 7
+	},
+	{
+		"id" : 11,
+		"title" : "VEGETABLES",
+		"description" : "",
+		"added_date" : "2021-08-11T03:43:19.973Z",
+		"added_by" : 7
+	}
+]}

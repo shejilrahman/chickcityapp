@@ -65,22 +65,30 @@ export default function CartPage() {
       localStorage.setItem("grocery-history", JSON.stringify(Array.from(new Set([...pastItems, ...cart.map(i => i.id)]))));
 
       const docRef = await addDoc(collection(db, "orders"), {
-        customerName: name, customerPhone: phone, customerLocation: location, customerLandmark: landmark,
+        customerName: name || "",
+        customerPhone: phone || "",
+        customerLocation: location || "",
+        customerLandmark: landmark || "",
         items: cart.map((item) => {
           const slab = item.weightSlab ? WEIGHT_SLABS[item.weightSlab] : null;
           const effectivePrice = slab && item.selectedGrams
             ? getSlabPrice(item.price, item.selectedGrams, slab.baseUnit)
             : item.price;
+          
           return {
-            id: item.id,
-            name: item.name,
-            price: effectivePrice,
-            quantity: item.weightSlab ? 1 : item.quantity,
-            unit: item.weightSlab && item.selectedGrams ? formatGrams(item.selectedGrams) : item.unit,
+            id: item.id || "",
+            name: item.name || "Unknown Item",
+            price: Number(effectivePrice) || 0,
+            quantity: item.weightSlab ? 1 : (Number(item.quantity) || 1),
+            unit: (item.weightSlab && item.selectedGrams) 
+              ? formatGrams(item.selectedGrams) 
+              : (item.unit || "Portion"),
             ...(item.weightSlab ? { weightSlab: item.weightSlab, selectedGrams: item.selectedGrams } : {}),
           };
         }),
-        total: totalPrice, status: "pending", timestamp: serverTimestamp(),
+        total: Number(totalPrice) || 0,
+        status: "pending",
+        timestamp: serverTimestamp(),
       });
 
       const pastOrders = JSON.parse(localStorage.getItem("grocery-orders") || "[]");
@@ -144,7 +152,7 @@ export default function CartPage() {
               ? getSlabPrice(item.price, item.selectedGrams, slab.baseUnit)
               : item.price;
             const lineTotal = effectivePrice * (slab ? 1 : item.quantity);
-            const unitLabel = slab ? formatGrams(item.selectedGrams) : `₹${item.price} / ${item.unit}`;
+            const unitLabel = slab ? formatGrams(item.selectedGrams) : `₹${item.price} ${item.unit ? "/ " + item.unit : ""}`;
 
             return (
             <div key={item.id} className="bg-white rounded-2xl p-3.5 flex items-center gap-3 shadow-sm border border-gray-100">

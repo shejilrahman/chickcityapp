@@ -1,13 +1,13 @@
-export const generateWhatsAppMessage = (items, total, name, phone, location) => {
+export const generateWhatsAppMessage = (items, total, name, phone, location, landmark) => {
   const number = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "8891930562";
   const shopName = process.env.NEXT_PUBLIC_SHOP_NAME || "Chick City Restaurant";
 
   let message = `🍗 *New Order - ${shopName}*\n\n`;
 
   items.forEach(item => {
-    // Assuming each item has: name, unit, price, and quantity
-    const itemTotal = item.price * item.quantity;
-    message += `• ${item.name} (${item.unit}) x ${item.quantity} — ₹${itemTotal}\n`;
+    const itemTotal = (item.price * (item.quantity || 1)).toFixed(2);
+    const unitPart = (item.unit && String(item.unit) !== "undefined") ? ` (${item.unit})` : "";
+    message += `• ${item.name}${unitPart} x ${item.quantity || 1} — ₹${itemTotal}\n`;
   });
 
   message += `\n*Total: ₹${total}*\n\n`;
@@ -15,12 +15,13 @@ export const generateWhatsAppMessage = (items, total, name, phone, location) => 
   message += `📞 Phone: ${phone}\n`;
   
   if (location) {
-    message += `📍 Location: ${location}\n\n`;
-  } else {
-    message += `\n`;
+    message += `📍 Address: ${location}\n`;
+  }
+  if (landmark) {
+    message += `🏢 Landmark: ${landmark}\n`;
   }
 
-  message += `_Sent via ${shopName} App_`;
+  message += `\n_Sent via ${shopName} App_`;
 
   const encodedMessage = encodeURIComponent(message);
   

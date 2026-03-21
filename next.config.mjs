@@ -12,4 +12,4 @@ const nextConfig = {
   // any Next.js config
 };
 
-export default withPWA(nextConfig);
+export default nextConfig;

@@ -15,7 +15,7 @@ export default function MapPicker({ onConfirm, onCancel }) {
   const [address, setAddress] = useState("");
   const [isGeocoding, setIsGeocoding] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
-  const [latlng, setLatlng] = useState({ lat: 17.385, lng: 78.4867 }); // Default: Hyderabad
+  const [latlng, setLatlng] = useState({ lat: 10.440528, lng: 76.094781}); // Default: Talikulam, Kerala
 
   // Reverse geocode using Nominatim (completely free)
   const reverseGeocode = async (lat, lng) => {

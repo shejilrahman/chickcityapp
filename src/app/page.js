@@ -6,19 +6,11 @@ import CategorySidebar from "@/components/CategorySidebar";
 import ProductCard from "@/components/ProductCard";
 import ProductListItem from "@/components/ProductListItem";
 import CartDrawer from "@/components/CartDrawer";
-import { Clock, Loader2, Sparkles } from "lucide-react";
+import { Clock, Loader2 } from "lucide-react";
 import Fuse from "fuse.js";
 import Link from "next/link";
 
 const PAGE_SIZE = 20; // Start small for fast first paint; infinite scroll loads more
-
-/* ── Delivery promise badges shown in the hero ── */
-const PROMISES = [
-  { emoji: "🚀", text: "30-45 min delivery" },
-  { emoji: "📍", text: "5 km range" },
-  { emoji: "🍗", text: "Hot & Fresh" },
-  { emoji: "✨", text: "Best Quality" },
-];
 
 export default function Home() {
   const [allProducts, setAllProducts] = useState([]);     // fetched from Firestore via API
@@ -146,95 +138,83 @@ export default function Home() {
       {/* ══════════════════════════════════════════
           STICKY HEADER  
       ══════════════════════════════════════════ */}
-      <header className="flex-shrink-0 header-glass safe-top z-40">
-
-        {/* ── Hero banner ── */}
+      <header className="flex-shrink-0 z-40">
         <div
-          className="relative overflow-hidden px-4 pt-4 pb-5"
+          className="relative overflow-hidden px-4 pt-3 pb-3"
           style={{
-            background: "linear-gradient(135deg, #064e3b 0%, #065f46 40%, #059669 80%, #047857 100%)",
+            background: "linear-gradient(160deg, #022c22 0%, #064e3b 45%, #065f46 100%)",
           }}
         >
-          {/* 🌙 Eid Mubarak Decorative Elements */}
-          <div className="absolute top-2 right-4 flex flex-col items-center">
-            <span className="text-3xl drop-shadow-[0_0_15px_rgba(251,191,36,0.6)] animate-pulse">🌙</span>
-            <span className="text-[10px] font-black text-amber-400 tracking-tighter uppercase mt-[-4px]">Eid Mubarak</span>
-          </div>
-          
-          <div className="absolute top-8 left-1/2 -translate-x-1/2 opacity-10 pointer-events-none select-none">
-            <span className="text-[80px]">🕌</span>
-          </div>
+          {/* ── Decorative Arabic pattern overlay ── */}
+          <div className="absolute inset-0 opacity-[0.04]" style={{
+            backgroundImage: `repeating-linear-gradient(45deg, #fbbf24 0, #fbbf24 1px, transparent 0, transparent 50%)`,
+            backgroundSize: "20px 20px",
+          }} />
 
-          <div className="absolute top-2 left-6 animate-bounce" style={{ animationDuration: "3s" }}>
-            <span className="text-xl opacity-60">🏮</span>
-          </div>
-          <div className="absolute top-12 right-24 animate-bounce" style={{ animationDuration: "4s" }}>
-            <span className="text-lg opacity-40">🏮</span>
+          {/* ── Glowing crescent top-right ── */}
+          <div className="absolute -top-4 -right-4 w-28 h-28 opacity-15 pointer-events-none">
+            <svg viewBox="0 0 100 100" fill="none">
+              <circle cx="50" cy="50" r="44" fill="#fbbf24" />
+              <circle cx="64" cy="38" r="36" fill="#022c22" />
+            </svg>
           </div>
 
-          {/* Animated background blobs */}
-          <div
-            className="blob absolute -top-10 -right-10 w-48 h-48 rounded-full opacity-30"
-            style={{ background: "radial-gradient(circle, #fbbf24 0%, transparent 70%)" }}
-          />
-          <div
-            className="blob blob-delay absolute bottom-[-20px] left-[-20px] w-32 h-32 rounded-full opacity-20"
-            style={{ background: "radial-gradient(circle, #fcd34d 0%, transparent 70%)" }}
-          />
+          {/* ── Subtle stars ── */}
+          {["top-2 left-[15%]", "top-5 left-[45%]", "top-1 right-[20%]"].map((pos, i) => (
+            <span key={i} className={`absolute ${pos} text-amber-400/40 text-xs animate-pulse`} style={{ animationDelay: `${i * 0.7}s` }}>✦</span>
+          ))}
 
-          {/* Top row: logo + orders */}
-          <div className="relative flex items-center justify-between mb-4 mt-2">
-            <div className="flex items-center gap-3">
-              {/* Store icon */}
-              <div className="w-12 h-12 bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl flex items-center justify-center shadow-xl relative overflow-hidden group">
-                <div className="absolute inset-0 bg-gradient-to-tr from-amber-400/20 to-transparent" />
-                <span className="text-2xl relative z-10 transition-transform group-active:scale-95">🍗</span>
-              </div>
-
+          {/* ── TOP ROW: brand + orders ── */}
+          <div className="relative flex items-center justify-between mb-2.5">
+            {/* Brand */}
+            <div className="flex items-center gap-2.5">
               <div>
-                <div className="flex items-center gap-1.5">
-                  <h1 className="text-white font-black text-[21px] tracking-tight leading-none drop-shadow-md">
+                <div className="flex items-center gap-2">
+                  <h1 className="text-white font-black text-[22px] tracking-tight leading-none drop-shadow-md">
                     Chick City
                   </h1>
-                  <span className="bg-amber-400/20 border border-amber-400/30 text-amber-400 text-[9px] font-black px-1.5 py-0.5 rounded-full flex items-center gap-0.5 uppercase tracking-wider shadow-sm">
-                    <Sparkles size={8} strokeWidth={3} />
-                    Eid Special
-                  </span>
+                  {/* Eid badge */}
+                  <div className="flex items-center gap-1 bg-amber-400/20 border border-amber-400/40 rounded-full px-2 py-0.5">
+                    <span className="text-[11px]">🌙</span>
+                    <span className="text-amber-300 text-[9px] font-black uppercase tracking-wider">Eid Special</span>
+                  </div>
                 </div>
-                <p className="text-emerald-200/80 text-[11px] font-bold mt-1 tracking-wider uppercase">
-                  Original Arabic Mandi & Grills
+                <p className="text-emerald-300/70 text-[10px] font-semibold mt-0.5 tracking-widest uppercase">
+                  Original Arabic Mandi · Grills · Al Fahm
                 </p>
               </div>
             </div>
 
-            {/* Orders button */}
+            {/* Orders icon button */}
             <Link
               href="/orders"
-              className="w-9 h-9 bg-white/15 border border-white/25 backdrop-blur-sm rounded-xl flex items-center justify-center active:bg-white/25 transition-colors"
+              className="w-9 h-9 bg-white/10 border border-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center active:bg-white/25 transition-colors"
             >
               <Clock size={17} className="text-white" strokeWidth={2} />
             </Link>
           </div>
 
-          {/* Promise badges row */}
-          <div className="relative flex items-center gap-2 mb-4 flex-wrap">
-            {PROMISES.map((p, i) => (
-              <div
-                key={i}
-                className="flex items-center gap-1 bg-white/15 border border-white/20 rounded-full px-2.5 py-1"
-              >
-                <span className="text-[13px]">{p.emoji}</span>
-                <span className="text-white text-[11px] font-semibold">{p.text}</span>
+          {/* ── PROMISE BADGES ROW — one line, compact ── */}
+          <div className="relative flex items-center gap-2 mb-3 overflow-x-auto hide-scrollbar">
+            {[
+              { emoji: "🚀", text: "30-45 min" },
+              { emoji: "📍", text: "5 km radius" },
+              { emoji: "🥡", text: "Min ₹300" },
+            ].map((p, i) => (
+              <div key={i} className="flex-shrink-0 flex items-center gap-1 bg-white/10 border border-white/15 rounded-full px-2.5 py-1">
+                <span className="text-[12px]">{p.emoji}</span>
+                <span className="text-white/90 text-[10px] font-semibold whitespace-nowrap">{p.text}</span>
               </div>
             ))}
-            {/* Minimum order badge */}
-            <div className="flex items-center gap-1 bg-yellow-300/20 border border-yellow-300/40 rounded-full px-2.5 py-1">
-              <span className="text-[13px]">🥡</span>
-              <span className="text-yellow-200 text-[11px] font-semibold">Min. order ₹300</span>
+            {/* Decorative divider + Eid text */}
+            <div className="flex-shrink-0 flex items-center gap-1 ml-auto">
+              <span className="text-amber-400/60 text-[10px]">✦</span>
+              <span className="text-amber-300/80 text-[10px] font-bold tracking-widest uppercase">Eid Mubarak</span>
+              <span className="text-amber-400/60 text-[10px]">✦</span>
             </div>
           </div>
 
-          {/* Search bar — sits at the bottom of the hero, overlapping the white section */}
+          {/* ── SEARCH BAR ── */}
           <div className="relative">
             <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
           </div>

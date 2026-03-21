@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = 'force-dynamic';
+
 import OrderTracker from "@/components/OrderTracker";
 import { ArrowLeft, Package } from "lucide-react";
 import { useRouter } from "next/navigation";

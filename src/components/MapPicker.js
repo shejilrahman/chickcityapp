@@ -18,7 +18,7 @@ export default function MapPicker({ onConfirm, onCancel }) {
   const [latlng, setLatlng] = useState({ lat: 10.440528, lng: 76.094781}); // Default: Talikulam, Kerala
 
   // Reverse geocode using Nominatim (completely free)
-  const reverseGeocode = async (lat, lng) => {
+  const reverseGeocode = useCallback(async (lat, lng) => {
     setIsGeocoding(true);
     try {
       const res = await fetch(
@@ -32,31 +32,26 @@ export default function MapPicker({ onConfirm, onCancel }) {
     } finally {
       setIsGeocoding(false);
     }
-  };
-
-  useEffect(() => {
-    // Dynamically load Leaflet CSS and JS (no npm install needed)
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
-    document.head.appendChild(link);
-
-    const script = document.createElement("script");
-    script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
-    script.onload = () => initMap();
-    document.head.appendChild(script);
-
-    return () => {
-      document.head.removeChild(link);
-      document.head.removeChild(script);
-      if (mapInstanceRef.current) {
-        mapInstanceRef.current.remove();
-        mapInstanceRef.current = null;
-      }
-    };
   }, []);
 
-  const initMap = () => {
+  const gpsLocate = useCallback((map, marker) => {
+    if (!navigator.geolocation) return;
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { latitude: lat, longitude: lng } = pos.coords;
+        map.setView([lat, lng], 16);
+        marker.setLatLng([lat, lng]);
+        setLatlng({ lat, lng });
+        await reverseGeocode(lat, lng);
+        setIsLocating(false);
+      },
+      () => setIsLocating(false),
+      { enableHighAccuracy: true, timeout: 8000 }
+    );
+  }, [reverseGeocode]);
+
+  const initMap = useCallback(() => {
     if (!mapRef.current || mapInstanceRef.current) return;
     const L = window.L;
 
@@ -103,24 +98,29 @@ export default function MapPicker({ onConfirm, onCancel }) {
 
     // Use GPS to center immediately
     gpsLocate(map, marker);
-  };
+  }, [latlng.lat, latlng.lng, reverseGeocode, gpsLocate]);
 
-  const gpsLocate = (map, marker) => {
-    if (!navigator.geolocation) return;
-    setIsLocating(true);
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        const { latitude: lat, longitude: lng } = pos.coords;
-        map.setView([lat, lng], 16);
-        marker.setLatLng([lat, lng]);
-        setLatlng({ lat, lng });
-        await reverseGeocode(lat, lng);
-        setIsLocating(false);
-      },
-      () => setIsLocating(false),
-      { enableHighAccuracy: true, timeout: 8000 }
-    );
-  };
+  useEffect(() => {
+    // Dynamically load Leaflet CSS and JS (no npm install needed)
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
+    document.head.appendChild(link);
+
+    const script = document.createElement("script");
+    script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
+    script.onload = () => initMap();
+    document.head.appendChild(script);
+
+    return () => {
+      document.head.removeChild(link);
+      document.head.removeChild(script);
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+    };
+  }, [initMap]);
 
   const handleGPSClick = () => {
     if (!mapInstanceRef.current || !markerRef.current) return;

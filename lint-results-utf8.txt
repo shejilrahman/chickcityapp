@@ -1,4 +1,8 @@
-﻿node.exe : 
+﻿
+> grocery-pwa@0.1.0 lint
+> next lint
+
+node.exe : 
 At line:1 char:1
 + & "C:\Program 
 Files\nodejs/node.exe" 
@@ -10,16 +14,37 @@ Files\nodejs/node_mo
 ~~~~~~~~~~~~~~~~~~~~~~~
 ~~
     + CategoryInfo     
-         : NotSpecifi  
-  ed: (:String) [],    
- RemoteException
-    + FullyQualifiedEr 
-   rorId : NativeComm  
-  andError
+         : 
+NotSpecified: (:St    
+ring) [], RemoteExcept 
+   ion
+    + 
+FullyQualifiedErrorI   
+ d : NativeCommandError
  
 ./src/app/admin/categor
 ies/page.js
-443:27  Warning: Using 
+21:32  Warning: React 
+Hook useEffect has a 
+missing dependency: 
+'load'. Either include 
+it or remove the 
+dependency array.  reac
+t-hooks/exhaustive-deps
+
+./src/app/admin/coupons
+/page.js
+19:32  Warning: React 
+Hook useEffect has a 
+missing dependency: 
+'load'. Either include 
+it or remove the 
+dependency array.  reac
+t-hooks/exhaustive-deps
+
+./src/app/admin/edit/pa
+ge.js
+169:23  Warning: Using 
 `<img>` could result 
 in slower LCP and 
 higher bandwidth. 
@@ -37,19 +62,25 @@ nt
 
 ./src/app/admin/feature
 d/page.js
-132:59  Error: `"` can 
-be escaped with 
-`&quot;`, `&ldquo;`, 
-`&#34;`, `&rdquo;`.  re
-act/no-unescaped-entiti
-es
-132:69  Error: `"` can 
-be escaped with 
-`&quot;`, `&ldquo;`, 
-`&#34;`, `&rdquo;`.  re
-act/no-unescaped-entiti
-es
 196:25  Warning: Using 
+`<img>` could result 
+in slower LCP and 
+higher bandwidth. 
+Consider using `<Image 
+/>` from `next/image` 
+to automatically 
+optimize images. This 
+may incur additional 
+usage or cost from 
+your provider. See: htt
+ps://nextjs.org/docs/me
+ssages/no-img-element  
+@next/next/no-img-eleme
+nt
+
+./src/app/admin/hidden/
+page.js
+272:25  Warning: Using 
 `<img>` could result 
 in slower LCP and 
 higher bandwidth. 
@@ -67,7 +98,7 @@ nt
 
 ./src/app/admin/images/
 page.js
-444:25  Warning: Using 
+384:27  Warning: Using 
 `<img>` could result 
 in slower LCP and 
 higher bandwidth. 
@@ -82,18 +113,96 @@ ps://nextjs.org/docs/me
 ssages/no-img-element  
 @next/next/no-img-eleme
 nt
-545:47  Error: `"` can 
+
+./src/app/admin/product
+s/page.js
+36:6  Warning: React 
+Hook useEffect has a 
+missing dependency: 
+'load'. Either include 
+it or remove the 
+dependency array.  reac
+t-hooks/exhaustive-deps
+230:27  Warning: Using 
+`<img>` could result 
+in slower LCP and 
+higher bandwidth. 
+Consider using `<Image 
+/>` from `next/image` 
+to automatically 
+optimize images. This 
+may incur additional 
+usage or cost from 
+your provider. See: htt
+ps://nextjs.org/docs/me
+ssages/no-img-element  
+@next/next/no-img-eleme
+nt
+392:21  Warning: Using 
+`<img>` could result 
+in slower LCP and 
+higher bandwidth. 
+Consider using `<Image 
+/>` from `next/image` 
+to automatically 
+optimize images. This 
+may incur additional 
+usage or cost from 
+your provider. See: htt
+ps://nextjs.org/docs/me
+ssages/no-img-element  
+@next/next/no-img-eleme
+nt
+
+./src/app/offline/page.
+js
+13:81  Error: `'` can 
 be escaped with 
-`&quot;`, `&ldquo;`, 
-`&#34;`, `&rdquo;`.  re
+`&apos;`, `&lsquo;`, 
+`&#39;`, `&rsquo;`.  re
 act/no-unescaped-entiti
 es
-545:58  Error: `"` can 
+15:50  Error: `'` can 
 be escaped with 
-`&quot;`, `&ldquo;`, 
-`&#34;`, `&rdquo;`.  re
+`&apos;`, `&lsquo;`, 
+`&#39;`, `&rsquo;`.  re
 act/no-unescaped-entiti
 es
+15:92  Error: `'` can 
+be escaped with 
+`&apos;`, `&lsquo;`, 
+`&#39;`, `&rsquo;`.  re
+act/no-unescaped-entiti
+es
+
+./src/components/Catego
+rySidebar.js
+49:17  Warning: Using 
+`<img>` could result 
+in slower LCP and 
+higher bandwidth. 
+Consider using `<Image 
+/>` from `next/image` 
+to automatically 
+optimize images. This 
+may incur additional 
+usage or cost from 
+your provider. See: htt
+ps://nextjs.org/docs/me
+ssages/no-img-element  
+@next/next/no-img-eleme
+nt
+
+./src/components/MapPic
+ker.js
+57:6  Warning: React 
+Hook useEffect has a 
+missing dependency: 
+'initMap'. Either 
+include it or remove 
+the dependency array.  
+react-hooks/exhaustive-
+deps
 
 info  - Need to 
 disable some ESLint 

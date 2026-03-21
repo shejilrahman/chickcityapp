@@ -16,7 +16,7 @@ export default function CouponsPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toast, setToast] = useState(null);
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => { load(); }, [load]);
 
   async function load() {
     setIsLoaded(false);

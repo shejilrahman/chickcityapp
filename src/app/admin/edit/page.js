@@ -22,25 +22,26 @@ export default function EditProductsPage() {
   const [error, setError] = useState(null);
   const [toast, setToast] = useState(null);
 
-  useEffect(() => {
-    async function load() {
-      try {
-        const [prodRes, catRes] = await Promise.all([
-          fetch("/api/products"),
-          fetch("/api/categories"),
-        ]);
-        if (!prodRes.ok || !catRes.ok) throw new Error("Failed to fetch data");
-        const [prodData, catData] = await Promise.all([prodRes.json(), catRes.json()]);
-        setProducts(prodData);
-        setCategories(catData);
-      } catch (e) {
-        setError(e.message);
-      } finally {
-        setIsLoaded(true);
-      }
+  const load = useCallback(async () => {
+    try {
+      const [prodRes, catRes] = await Promise.all([
+        fetch("/api/products"),
+        fetch("/api/categories"),
+      ]);
+      if (!prodRes.ok || !catRes.ok) throw new Error("Failed to fetch data");
+      const [prodData, catData] = await Promise.all([prodRes.json(), catRes.json()]);
+      setProducts(prodData);
+      setCategories(catData);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setIsLoaded(true);
     }
-    load();
   }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const filteredProducts = useMemo(() => {
     const term = search.toLowerCase();
@@ -166,6 +167,7 @@ export default function EditProductsPage() {
                 >
                   <div className="w-12 h-12 rounded-xl bg-slate-950 flex items-center justify-center overflow-hidden border border-slate-800 flex-shrink-0">
                     {p.image ? (
+                      /* eslint-disable-next-line @next/next/no-img-element */
                       <img src={p.image} className="w-full h-full object-cover" alt="" />
                     ) : (
                       <span className="text-xl">{p.emoji || "📦"}</span>

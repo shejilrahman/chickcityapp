@@ -88,9 +88,9 @@ export default function SplashScreen({ onDone }) {
           <p className={`m-0 text-[11px] tracking-[5px] uppercase font-[400] transition-all duration-300
             ${isFlickerSub 
               ? "text-white [text-shadow:0_0_6px_#fff,0_0_14px_rgba(255,255,255,0.5)] animate-[flicker_0.7s_ease_forwards]" 
-              : "text-[#0a0a0a]"}
+              : "text-white"}
           `}>
-            Family Restaurant
+            e3aurant
           </p>
         </div>
 

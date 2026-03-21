@@ -33,7 +33,7 @@ export default function ProductsAdminPage() {
 
   useEffect(() => {
     load();
-  }, []);
+  }, [load]);
 
   async function load() {
     setIsLoaded(false);
@@ -225,7 +225,7 @@ export default function ProductsAdminPage() {
                 return (
                   <div key={p.id} className="flex items-center gap-4 p-4 hover:bg-slate-800/40 group">
                     {/* Image */}
-                    <div className="w-12 h-12 rounded-xl bg-slate-950 overflow-hidden border border-slate-800 flex-shrink-0">
+                    <div className="w-12 h-12 rounded-xl bg-slate-950 overflow-hidden border border-slate-800 flex-shrink-0 relative">
                       {p.image
                         ? <img src={p.image} className="w-full h-full object-cover" alt="" />
                         : <span className="w-full h-full flex items-center justify-center text-xl">🍽️</span>
@@ -389,6 +389,7 @@ export default function ProductsAdminPage() {
                   <input type="text" value={form.image} onChange={e => setForm(f => ({ ...f, image: e.target.value }))}
                     className="form-input" placeholder="https://..." />
                   {form.image && (
+                    /* eslint-disable-next-line @next/next/no-img-element */
                     <img src={form.image} alt="" className="mt-2 w-full h-28 object-cover rounded-xl border border-slate-700" />
                   )}
                 </Field>

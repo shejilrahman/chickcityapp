@@ -28,7 +28,7 @@ export default function ImageAdminPage() {
   const [isDragging, setIsDragging] = useState(false);
   const [dragInfo, setDragInfo] = useState(null);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const [prodRes, catRes] = await Promise.all([
         fetch("/api/products"),
@@ -55,7 +55,7 @@ export default function ImageAdminPage() {
       setError(e.message);
       setIsLoaded(true);
     }
-  };
+  }, []);
 
   const drawOriginal = useCallback(() => {
     const canvas = canvasRef.current;
@@ -91,7 +91,7 @@ export default function ImageAdminPage() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   useEffect(() => {
     if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
@@ -381,8 +381,10 @@ export default function ImageAdminPage() {
                       ${sel ? "border-blue-500 ring-2 ring-blue-500/20" : "border-slate-800"}
                     `}>
                       {img 
-                        ? <img src={img} className="w-full h-full object-cover" alt="" />
-                        : <div className="w-full h-full flex items-center justify-center text-slate-800"><ImageIcon size={24} /></div>
+                        ? (
+                          /* eslint-disable-next-line @next/next/no-img-element */
+                          <img src={img} className="w-full h-full object-cover" alt="" />
+                        ) : <div className="w-full h-full flex items-center justify-center text-slate-800"><ImageIcon size={24} /></div>
                       }
                     </div>
                     <div className="flex-1 min-w-0">

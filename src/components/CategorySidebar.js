@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 const categoryEmoji = {
   "All":               "🍗",
   "MANDI":             "🍚",
@@ -46,10 +48,12 @@ export default function CategorySidebar({ categories, selectedCategory, setSelec
               ${image ? "" : "bg-emerald-50"}
             `}>
               {image ? (
-                <img 
+                <Image 
                   src={image} 
                   alt={title}
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
+                  sizes="44px"
                 />
               ) : (
                 <span className="text-[22px] leading-none">

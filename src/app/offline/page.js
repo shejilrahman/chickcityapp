@@ -10,9 +10,9 @@ export default function OfflinePage() {
         <div className="absolute inset-0 bg-emerald-500/10 rounded-3xl animate-ping scale-110" />
       </div>
 
-      <h1 className="text-2xl font-black text-slate-900 mb-2 tracking-tight">You're Offline</h1>
+      <h1 className="text-2xl font-black text-slate-900 mb-2 tracking-tight">You&apos;re Offline</h1>
       <p className="text-slate-500 mb-8 max-w-[240px] leading-relaxed">
-        Please check your internet connection. We'll be ready for your order as soon as you're back online!
+        Please check your internet connection. We&apos;ll be ready for your order as soon as you&apos;re back online!
       </p>
 
       <button 

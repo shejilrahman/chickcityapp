@@ -17,29 +17,30 @@ export default function FeaturedAdminPage() {
 
   const RESULTS_CAP = 100;
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [prodRes, catRes] = await Promise.all([
-          fetch("/api/products"),
-          fetch("/api/categories")
-        ]);
-        
-        if (!prodRes.ok || !catRes.ok) throw new Error("Failed to fetch data");
-        
-        const prodData = await prodRes.json();
-        const catData = await catRes.json();
-        
-        setProducts(prodData);
-        setCategories(catData);
-        setIsLoaded(true);
-      } catch (e) {
-        setError(e.message);
-        setIsLoaded(true);
-      }
-    };
-    fetchData();
+  const fetchData = useCallback(async () => {
+    try {
+      const [prodRes, catRes] = await Promise.all([
+        fetch("/api/products"),
+        fetch("/api/categories")
+      ]);
+      
+      if (!prodRes.ok || !catRes.ok) throw new Error("Failed to fetch data");
+      
+      const prodData = await prodRes.json();
+      const catData = await catRes.json();
+      
+      setProducts(prodData);
+      setCategories(catData);
+      setIsLoaded(true);
+    } catch (e) {
+      setError(e.message);
+      setIsLoaded(true);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   useEffect(() => {
     const term = search.toLowerCase();
@@ -191,8 +192,9 @@ export default function FeaturedAdminPage() {
                       {isFeatured ? <CheckSquare size={22} /> : <Square size={22} className="text-slate-600" />}
                     </button>
 
-                    <div className="w-12 h-12 rounded-xl bg-slate-950 flex items-center justify-center overflow-hidden border border-slate-800 flex-shrink-0">
+                    <div className="w-12 h-12 rounded-xl bg-slate-950 flex items-center justify-center overflow-hidden border border-slate-800 flex-shrink-0 relative">
                       {p.image ? (
+                        /* eslint-disable-next-line @next/next/no-img-element */
                         <img src={p.image} className="w-full h-full object-cover" alt="" />
                       ) : (
                         <span className="text-xl">{p.emoji || "📦"}</span>

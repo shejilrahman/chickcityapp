@@ -22,6 +22,7 @@ const PROMISES = [
 
 export default function Home() {
   const [allProducts, setAllProducts] = useState([]);     // fetched from Firestore via API
+  const [allCategories, setAllCategories] = useState([]); // fetched from Firestore
   const [productsLoaded, setProductsLoaded] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -31,19 +32,21 @@ export default function Home() {
   const loaderRef  = useRef(null);
   const contentRef = useRef(null);
 
-  // Fetch products from Firestore (via API) and filter out hidden ones
+  // Fetch products and categories from Firestore (via API)
   useEffect(() => {
-    fetch("/api/products")
-      .then((r) => r.json())
-      .then((data) => {
-        // Filter out products where hidden === true
-        setAllProducts(Array.isArray(data) ? data.filter((p) => !p.hidden) : []);
-        setProductsLoaded(true);
-      })
-      .catch((err) => {
-        console.error("Failed to load products", err);
-        setProductsLoaded(true);
-      });
+    Promise.all([
+      fetch("/api/products").then(r => r.json()),
+      fetch("/api/categories").then(r => r.json())
+    ])
+    .then(([prodData, catData]) => {
+      setAllProducts(Array.isArray(prodData) ? prodData.filter((p) => !p.hidden) : []);
+      setAllCategories(Array.isArray(catData) ? catData : []);
+      setProductsLoaded(true);
+    })
+    .catch((err) => {
+      console.error("Failed to load data", err);
+      setProductsLoaded(true);
+    });
   }, []);
 
   useEffect(() => {
@@ -57,10 +60,11 @@ export default function Home() {
     }
   }, []);
 
-  const categories = useMemo(
-    () => ["All", ...Array.from(new Set(allProducts.map((p) => p.category)))],
-    [allProducts]
-  );
+  const categories = useMemo(() => {
+    const activeFromProducts = Array.from(new Set(allProducts.map((p) => p.category)));
+    const enriched = allCategories.filter(c => activeFromProducts.includes(c.title));
+    return [{ id: "all", title: "All", emoji: "🍗" }, ...enriched];
+  }, [allProducts, allCategories]);
 
   const filteredProducts = useMemo(() => {
     const categoryFiltered = allProducts.filter(p =>

@@ -1,14 +1,15 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Search, Image as ImageIcon, CheckCircle2, Save, Upload, Trash2, Loader2, CheckSquare, Square, Users, MousePointer2, ClipboardPaste, Globe, ArrowRight } from "lucide-react";
+import { Search, Image as ImageIcon, CheckCircle2, Save, Upload, Trash2, Loader2, CheckSquare, Square, Users, MousePointer2, ClipboardPaste, Globe, ArrowRight, LayoutGrid, Package } from "lucide-react";
 import AdminNav from "@/components/AdminNav";
 
 export default function ImageAdminPage() {
+  const [mode, setMode] = useState("products"); // "products" or "categories"
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [search, setSearch] = useState("");
-  const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -27,25 +28,24 @@ export default function ImageAdminPage() {
   const [isDragging, setIsDragging] = useState(false);
   const [dragInfo, setDragInfo] = useState(null);
 
-  const fetchProducts = async () => {
+  const fetchData = async () => {
     try {
-      const res = await fetch("/api/products");
-      if (!res.ok) throw new Error("Failed to fetch products");
-      const data = await res.json();
-      setProducts(data);
+      const [prodRes, catRes] = await Promise.all([
+        fetch("/api/products"),
+        fetch("/api/categories")
+      ]);
+      
+      if (!prodRes.ok || !catRes.ok) throw new Error("Failed to fetch data");
+      
+      const prodData = await prodRes.json();
+      const catData = await catRes.json();
+      
+      setProducts(prodData);
+      setCategories(catData);
       setIsLoaded(true);
     } catch (e) {
       setError(e.message);
       setIsLoaded(true);
-    }
-  };
-
-  const fetchCategories = async () => {
-    try {
-      const res = await fetch("/api/categories");
-      if (res.ok) setCategories(await res.json());
-    } catch (e) {
-      console.error(e);
     }
   };
 
@@ -82,24 +82,28 @@ export default function ImageAdminPage() {
   }, [cropRect]);
 
   useEffect(() => {
-    fetchProducts();
-    fetchCategories();
+    fetchData();
   }, []);
 
   useEffect(() => {
     if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
     searchTimerRef.current = setTimeout(() => {
       const term = search.toLowerCase();
-      const filtered = products.filter(p => {
-        const matchesSearch = p.name?.toLowerCase().includes(term);
-        const matchesCategory = selectedCategory === "All" || p.category === selectedCategory;
-        return matchesSearch && matchesCategory;
-      });
-      const shouldCap = selectedCategory === "All" && !term;
-      setFilteredProducts(shouldCap ? filtered.slice(0, RESULTS_CAP) : filtered);
+      if (mode === "products") {
+        const filtered = products.filter(p => {
+          const matchesSearch = p.name?.toLowerCase().includes(term);
+          const matchesCategory = selectedCategory === "All" || p.category === selectedCategory;
+          return matchesSearch && matchesCategory;
+        });
+        const shouldCap = selectedCategory === "All" && !term;
+        setFilteredProducts(shouldCap ? filtered.slice(0, RESULTS_CAP) : filtered);
+      } else {
+        const filtered = categories.filter(c => c.title?.toLowerCase().includes(term));
+        setFilteredProducts(filtered);
+      }
     }, 200);
     return () => clearTimeout(searchTimerRef.current);
-  }, [search, products, selectedCategory]);
+  }, [search, products, categories, selectedCategory, mode]);
 
   useEffect(() => {
     if (originalImage && canvasRef.current) {
@@ -164,17 +168,19 @@ export default function ImageAdminPage() {
     return () => window.removeEventListener("paste", handleGlobalPaste);
   }, [categories]); // dependencies keep it alive
 
-  const toggleSelect = (product) => {
+  const toggleSelect = (item) => {
     setSaveResults(null);
+    const id = mode === "products" ? item.id : item.id; // both use id
+    const name = mode === "products" ? item.name : item.title;
+    
     setSelectedIds(prev => {
       const next = new Set(prev);
-      if (next.has(product.id)) {
-        next.delete(product.id);
+      if (next.has(id)) {
+        next.delete(id);
       } else {
-        next.add(product.id);
-        // Pre-fill search term if it's the first one or we're adding to a small selection
+        next.add(id);
         if (next.size === 1) {
-          setGoogleSearchTerm(product.name);
+          setGoogleSearchTerm(name);
         }
       }
       return next;
@@ -202,9 +208,11 @@ export default function ImageAdminPage() {
     const base64 = getCroppedBase64();
     const succeeded = [];
     const failed = [];
+    const apiUrl = mode === "products" ? "/api/products/update-image" : "/api/categories/update-image";
+
     await Promise.all([...selectedIds].map(async (id) => {
       try {
-        const res = await fetch("/api/products/update-image", {
+        const res = await fetch(apiUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ id, image: base64 })
@@ -212,14 +220,22 @@ export default function ImageAdminPage() {
         if (res.ok) succeeded.push({ id, path: (await res.json()).path }); else failed.push(id);
       } catch { failed.push(id); }
     }));
-    setProducts(prev => prev.map(p => {
-      const found = succeeded.find(s => s.id === p.id);
-      return found ? { ...p, image: found.path } : p;
-    }));
+
+    if (mode === "products") {
+      setProducts(prev => prev.map(p => {
+        const found = succeeded.find(s => s.id === p.id);
+        return found ? { ...p, image: found.path } : p;
+      }));
+    } else {
+      setCategories(prev => prev.map(c => {
+        const found = succeeded.find(s => s.id === c.id);
+        return found ? { ...c, image: found.path } : c;
+      }));
+    }
+
     setSaveResults({ success: succeeded.map(s => s.id), failed });
     setIsSubmitting(false);
     if (failed.length === 0) { 
-      // Auto-clear after successful save to prepare for next paste
       setTimeout(() => handleClear(), 1500); 
     }
   };
@@ -270,10 +286,10 @@ export default function ImageAdminPage() {
   if (error) {
     return (
       <div className="h-screen bg-slate-950 flex flex-col items-center justify-center text-red-500 p-4 font-mono">
-        <h2 className="text-2xl font-bold mb-4">Error Loading Products</h2>
+        <h2 className="text-2xl font-bold mb-4">Error Loading Data</h2>
         <p className="bg-slate-900 p-4 rounded border border-red-900/50 max-w-md text-center">{error}</p>
         <button
-          onClick={() => { setError(null); setIsLoaded(false); fetchProducts(); }}
+          onClick={() => { setError(null); setIsLoaded(false); fetchData(); }}
           className="mt-6 px-6 py-2 bg-slate-800 text-slate-200 rounded hover:bg-slate-700 transition-colors"
         >
           Retry
@@ -295,22 +311,33 @@ export default function ImageAdminPage() {
               <h2 className="text-xl font-black tracking-tight flex items-center gap-2">
                 <ImageIcon size={22} className="text-blue-500" /> Images
               </h2>
-              <div className="flex items-center gap-2">
-                <div className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase">
-                  {products.filter(p => p.image).length} / {products.length} Complete
-                </div>
+              <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800">
+                <button 
+                  onClick={() => { setMode("products"); handleClear(); }}
+                  className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all flex items-center gap-1.5 ${mode === "products" ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20" : "text-slate-500 hover:bg-slate-900"}`}
+                >
+                  <Package size={12} /> Products
+                </button>
+                <button 
+                  onClick={() => { setMode("categories"); handleClear(); }}
+                  className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase transition-all flex items-center gap-1.5 ${mode === "categories" ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20" : "text-slate-500 hover:bg-slate-900"}`}
+                >
+                  <LayoutGrid size={12} /> Categories
+                </button>
               </div>
             </div>
             
             <div className="relative group">
               <Search className="absolute left-3 top-3 text-slate-500 group-focus-within:text-blue-400 transition-colors" size={16} />
-              <input type="text" placeholder="Search product name..." className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-3 text-sm focus:ring-2 focus:ring-blue-500/50 outline-none transition-all" value={search} onChange={e => setSearch(e.target.value)} />
+              <input type="text" placeholder={`Search ${mode}...`} className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-3 text-sm focus:ring-2 focus:ring-blue-500/50 outline-none transition-all" value={search} onChange={e => setSearch(e.target.value)} />
             </div>
 
-            <select className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/50 outline-none appearance-none cursor-pointer" value={selectedCategory} onChange={e => setSelectedCategory(e.target.value)}>
-              <option value="All">All Categories</option>
-              {categories.map(c => <option key={c.id} value={c.title}>{c.emoji} {c.title}</option>)}
-            </select>
+            {mode === "products" && (
+              <select className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/50 outline-none appearance-none cursor-pointer" value={selectedCategory} onChange={e => setSelectedCategory(e.target.value)}>
+                <option value="All">All Categories</option>
+                {categories.map(c => <option key={c.id} value={c.title}>{c.emoji} {c.title}</option>)}
+              </select>
+            )}
 
             <div className="flex items-center justify-between pt-2">
               <button onClick={() => selectedIds.size > 0 ? setSelectedIds(new Set()) : filteredProducts.forEach(x => toggleSelect(x))} 
@@ -323,13 +350,19 @@ export default function ImageAdminPage() {
           </div>
 
           <div className="flex-1 overflow-y-auto divide-y divide-slate-800/50">
-            {filteredProducts.map(p => {
-              const sel = selectedIds.has(p.id);
-              const ok = saveResults?.success.includes(p.id);
-              const fail = saveResults?.failed.includes(p.id);
+            {filteredProducts.map(item => {
+              const id = item.id;
+              const name = mode === "products" ? item.name : item.title;
+              const sub = mode === "products" ? item.category : "Category";
+              const img = item.image;
+              
+              const sel = selectedIds.has(id);
+              const ok = saveResults?.success.includes(id);
+              const fail = saveResults?.failed.includes(id);
+              
               return (
-                <div key={p.id} className="group/item relative">
-                  <button onClick={() => toggleSelect(p)} 
+                <div key={id} className="group/item relative">
+                  <button onClick={() => toggleSelect(item)} 
                     className={`w-full text-left p-4 flex items-center gap-4 transition-all hover:bg-slate-800/40 relative
                       ${sel ? "bg-blue-600/10 z-10" : ""}
                       ${ok ? "bg-green-500/5" : ""}
@@ -339,16 +372,16 @@ export default function ImageAdminPage() {
                     <div className={`w-16 h-16 flex-shrink-0 rounded-xl bg-slate-950 border overflow-hidden transition-all shadow-lg
                       ${sel ? "border-blue-500 ring-2 ring-blue-500/20" : "border-slate-800"}
                     `}>
-                      {p.image 
-                        ? <img src={p.image} className="w-full h-full object-cover" alt="" />
+                      {img 
+                        ? <img src={img} className="w-full h-full object-cover" alt="" />
                         : <div className="w-full h-full flex items-center justify-center text-slate-800"><ImageIcon size={24} /></div>
                       }
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className={`font-bold text-sm truncate ${sel ? "text-blue-400" : "text-slate-300"}`}>{p.name}</div>
-                      <div className="text-[10px] font-black text-slate-600 mt-0.5 uppercase tracking-tighter">{p.category}</div>
+                      <div className={`font-bold text-sm truncate ${sel ? "text-blue-400" : "text-slate-300"}`}>{mode === "categories" && item.emoji} {name}</div>
+                      <div className="text-[10px] font-black text-slate-600 mt-0.5 uppercase tracking-tighter">{sub}</div>
                       <div className="flex items-center gap-2 mt-1.5">
-                        {p.image && <span className="text-[9px] font-bold bg-green-500/20 text-green-400 px-1.5 py-0.5 rounded uppercase">Image OK</span>}
+                        {img && <span className="text-[9px] font-bold bg-green-500/20 text-green-400 px-1.5 py-0.5 rounded uppercase">Image OK</span>}
                         {ok && <span className="text-[9px] font-bold bg-blue-500 text-white px-1.5 py-0.5 rounded uppercase animate-bounce">Saved!</span>}
                         {fail && <span className="text-[9px] font-bold bg-red-500 text-white px-1.5 py-0.5 rounded uppercase">Failed</span>}
                       </div>
@@ -358,7 +391,7 @@ export default function ImageAdminPage() {
                     </div>
                   </button>
                   <button 
-                    onClick={(e) => { e.stopPropagation(); handleGoogleSearch(p.name); }}
+                    onClick={(e) => { e.stopPropagation(); handleGoogleSearch(name); }}
                     title="Search on Google Images"
                     className="absolute right-12 top-1/2 -translate-y-1/2 p-2 bg-slate-950 border border-slate-800 rounded-lg text-slate-500 hover:text-blue-400 hover:border-blue-500/50 opacity-0 group-hover/item:opacity-100 transition-all z-20 shadow-xl"
                   >
@@ -371,7 +404,11 @@ export default function ImageAdminPage() {
 
           <div className="p-4 bg-slate-950/50 border-t border-slate-800">
             <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
-              <div className="h-full bg-blue-500 transition-all duration-1000" style={{ width: `${(products.filter(p => p.image).length / products.length) * 100}%` }} />
+               {mode === "products" ? (
+                 <div className="h-full bg-blue-500 transition-all duration-1000" style={{ width: `${(products.filter(p => p.image).length / products.length) * 100}%` }} />
+               ) : (
+                 <div className="h-full bg-green-500 transition-all duration-1000" style={{ width: `${(categories.filter(c => c.image).length / categories.length) * 100}%` }} />
+               )}
             </div>
           </div>
         </div>
@@ -381,9 +418,9 @@ export default function ImageAdminPage() {
           <div className="h-16 bg-slate-900/50 backdrop-blur-xl border-b border-slate-800 flex items-center justify-between px-8 z-10">
             <div className="flex items-center gap-4 flex-1">
               <div className="flex flex-col flex-shrink-0">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Image Workspace</span>
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">{mode} Workspace</span>
                 <span className="text-sm font-black text-white whitespace-nowrap">
-                   {selectedIds.size === 0 ? "Select products to begin" : `${selectedIds.size} Target Selected`}
+                   {selectedIds.size === 0 ? `Select ${mode} to begin` : `${selectedIds.size} Target Selected`}
                 </span>
               </div>
 
@@ -443,7 +480,7 @@ export default function ImageAdminPage() {
                 </div>
                 <h3 className="text-xl font-black mb-2">Ready to Paste</h3>
                 <p className="text-slate-500 text-sm leading-relaxed mb-6">
-                  Select a product to search on Google. Copy an image from results and press <kbd className="bg-slate-800 px-2 py-1 rounded text-white text-xs mx-1">Ctrl + V</kbd> to paste.
+                  Select a {mode === "products" ? "product" : "category"} to search on Google. Copy an image from results and press <kbd className="bg-slate-800 px-2 py-1 rounded text-white text-xs mx-1">Ctrl + V</kbd> to paste.
                 </p>
                 <div className="grid grid-cols-2 gap-3 w-full">
                    <div className="bg-slate-900 p-3 rounded-2xl border border-slate-800">

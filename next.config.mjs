@@ -2,7 +2,7 @@ import withPWAInit from "next-pwa";
 
 const withPWA = withPWAInit({
   dest: "public",
-  disable: true, // Temporarily disabled to diagnose build error
+  disable: process.env.NODE_ENV === "development",
   register: true,
   skipWaiting: true,
 });
@@ -12,4 +12,4 @@ const nextConfig = {
   // any Next.js config
 };
 
-export default nextConfig;
+export default withPWA(nextConfig);

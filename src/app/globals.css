@@ -87,4 +87,9 @@
 
   /* ── Soft card shadow ── */
   .card-shadow { box-shadow: 0 2px 12px rgba(124, 34, 235, 0.08); }
+
+  /* ── Admin form input ── */
+  .form-input {
+    @apply w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-orange-500 outline-none transition-all;
+  }
 }

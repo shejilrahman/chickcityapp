@@ -41,7 +41,15 @@ export default function ImageAdminPage() {
       const catData = await catRes.json();
       
       setProducts(prodData);
-      setCategories(catData);
+      
+      // Ensure "All" is in the categories list for editing
+      const hasAll = catData.find(c => c.id === "all" || c.title === "All");
+      if (!hasAll) {
+        setCategories([{ id: "all", title: "All", emoji: "🍗" }, ...catData]);
+      } else {
+        setCategories(catData);
+      }
+      
       setIsLoaded(true);
     } catch (e) {
       setError(e.message);
@@ -170,7 +178,7 @@ export default function ImageAdminPage() {
 
   const toggleSelect = (item) => {
     setSaveResults(null);
-    const id = mode === "products" ? item.id : item.id; // both use id
+    const id = item.id;
     const name = mode === "products" ? item.name : item.title;
     
     setSelectedIds(prev => {
@@ -405,9 +413,9 @@ export default function ImageAdminPage() {
           <div className="p-4 bg-slate-950/50 border-t border-slate-800">
             <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
                {mode === "products" ? (
-                 <div className="h-full bg-blue-500 transition-all duration-1000" style={{ width: `${(products.filter(p => p.image).length / products.length) * 100}%` }} />
+                 <div className="h-full bg-blue-500 transition-all duration-1000" style={{ width: `${(products.filter(p => p.image).length / (products.length || 1)) * 100}%` }} />
                ) : (
-                 <div className="h-full bg-green-500 transition-all duration-1000" style={{ width: `${(categories.filter(c => c.image).length / categories.length) * 100}%` }} />
+                 <div className="h-full bg-green-500 transition-all duration-1000" style={{ width: `${(categories.filter(c => c.image).length / (categories.length || 1)) * 100}%` }} />
                )}
             </div>
           </div>

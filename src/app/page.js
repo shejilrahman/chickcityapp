@@ -62,8 +62,18 @@ export default function Home() {
 
   const categories = useMemo(() => {
     const activeFromProducts = Array.from(new Set(allProducts.map((p) => p.category)));
-    const enriched = allCategories.filter(c => activeFromProducts.includes(c.title));
-    return [{ id: "all", title: "All", emoji: "🍗" }, ...enriched];
+    const enriched = allCategories.filter(c => activeFromProducts.includes(c.title) || c.id === "all" || c.title === "All");
+    
+    // Find the Firestore "All" category if it exists
+    const dbAll = allCategories.find(c => c.id === "all" || c.title === "All");
+    
+    // Final "All" item: prefers Firestore data, fallbacks to hardcoded
+    const finalAll = dbAll || { id: "all", title: "All", emoji: "🍗" };
+    
+    // Filter out categories that are not "All" but are active in products
+    const others = enriched.filter(c => c.title !== "All" && c.id !== "all");
+    
+    return [finalAll, ...others];
   }, [allProducts, allCategories]);
 
   const filteredProducts = useMemo(() => {

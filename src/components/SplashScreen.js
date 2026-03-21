@@ -95,7 +95,7 @@ export default function SplashScreen({ onDone }) {
         </div>
 
         {/* Tagline Badge */}
-        <div className={`mt-[36px] bg-[rgba(232,73,58,0.1)] border border-[rgba(232,73,58,0.25)] rounded-full px-[20px] py-[8px] flex items-center gap-[8px] transition-opacity duration-1000
+        <div className={`mt-[48px] bg-[rgba(232,73,58,0.1)] border border-[rgba(232,73,58,0.25)] rounded-full px-[20px] py-[8px] flex items-center gap-[8px] transition-opacity duration-1000
           ${showOtherElements ? "opacity-100" : "opacity-0"}
         `}>
           <div className="w-[6px] h-[6px] bg-[#e8281a] rounded-full shadow-[0_0_5px_#e8281a]" />
@@ -104,10 +104,10 @@ export default function SplashScreen({ onDone }) {
         </div>
 
         {/* Loading bar footer */}
-        <div className="absolute bottom-[80px] w-[130px] h-[2px] bg-[#1e1e1e] rounded-full overflow-hidden">
+        <div className="m-10 absolute bottom-[28px] w-[130px] h-[2px] bg-[#1e1e1e] rounded-full overflow-hidden">
           <div className="h-full bg-[#e8281a] transition-all duration-300" style={{ width: `${loadPercent}%` }} />
         </div>
-        <p className="absolute bottom-[56px] text-[10px] text-[#333] tracking-[3px] uppercase">Welcome</p>
+        {/* <p className="absolute bottom-[12px] text-[10px] text-[#333] tracking-[3px] uppercase">Welcome</p> */}
       </div>
 
       <style jsx global>{`

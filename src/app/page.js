@@ -9,6 +9,7 @@ import CartDrawer from "@/components/CartDrawer";
 import { Clock, Loader2, Sparkles } from "lucide-react";
 import Fuse from "fuse.js";
 import Link from "next/link";
+import SplashScreen from "@/components/SplashScreen";
 
 const PAGE_SIZE = 40;
 
@@ -29,6 +30,8 @@ export default function Home() {
   const [pastItems, setPastItems] = useState([]);
   const [isHydrated, setIsHydrated] = useState(false);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [isSplashComplete, setIsSplashComplete] = useState(false);
+
   const loaderRef  = useRef(null);
   const contentRef = useRef(null);
 
@@ -135,25 +138,14 @@ export default function Home() {
   const pastProducts    = allProducts.filter(p => pastItems.includes(p.id)).slice(0, 8);
   const isSearching     = !!searchTerm.trim();
 
-  /* ─── Skeleton loader ─── */
-  if (!isHydrated || !productsLoaded) {
-    return (
-      <div className="h-screen flex flex-col" style={{ background: "#f0faf4" }}>
-        {/* Fake header */}
-        <div className="h-[168px] shimmer flex-shrink-0 rounded-b-3xl" />
-        <div className="flex flex-1 overflow-hidden mt-1">
-          <div className="w-[72px] shimmer" />
-          <div className="flex-1 grid grid-cols-2 gap-3 p-3">
-            {[1,2,3,4].map(i => <div key={i} className="h-52 shimmer rounded-xl" />)}
-          </div>
-        </div>
-      </div>
-    );
+  /* ─── Splash screen transition ─── */
+  if (!isHydrated || !productsLoaded || !isSplashComplete) {
+    return <SplashScreen onDone={() => setIsSplashComplete(true)} />;
   }
 
   /* ─── Full page ─── */
   return (
-    <div className="h-screen flex flex-col overflow-hidden" style={{ background: "#f0faf4" }}>
+    <div className="h-screen flex flex-col overflow-hidden animate-in fade-in duration-700" style={{ background: "#f0faf4" }}>
 
       {/* ══════════════════════════════════════════
           STICKY HEADER  

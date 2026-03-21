@@ -11,7 +11,11 @@ const manjari = Manjari({
 });
 
 export const viewport = {
-  themeColor: "#6d28d9",
+  themeColor: "#065f46",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export const metadata = {
@@ -20,8 +24,11 @@ export const metadata = {
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "default",
+    statusBarStyle: "black-translucent",
     title: "Chick City",
+  },
+  formatDetection: {
+    telephone: false,
   },
 };
 

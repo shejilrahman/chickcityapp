@@ -28,6 +28,11 @@
 
   * {
     -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+
+  button, a {
+    user-select: none;
   }
 }
 

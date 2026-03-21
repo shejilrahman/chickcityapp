@@ -74,7 +74,7 @@ export default function ProductListItem({ product }) {
           /* Slab product in cart */
           <div className="flex items-center border border-purple-500 rounded-lg overflow-hidden">
             <button
-              onClick={() => updateQuantity(product.id, -1)}
+              onClick={() => { updateQuantity(product.id, -1); navigator.vibrate?.(10); }}
               className="w-8 h-8 flex items-center justify-center text-purple-600 active:bg-purple-50 transition-colors"
             >
               <Minus size={13} strokeWidth={3} />
@@ -83,7 +83,7 @@ export default function ProductListItem({ product }) {
               {formatGrams(selectedGrams)}
             </span>
             <button
-              onClick={() => updateQuantity(product.id, 1)}
+              onClick={() => { updateQuantity(product.id, 1); navigator.vibrate?.(10); }}
               disabled={selectedGrams >= slab.max}
               className="w-8 h-8 flex items-center justify-center bg-green-500 text-white active:bg-green-600 transition-colors disabled:opacity-40"
             >
@@ -94,7 +94,7 @@ export default function ProductListItem({ product }) {
           /* Regular product in cart */
           <div className="flex items-center border border-purple-500 rounded-lg overflow-hidden">
             <button
-              onClick={() => updateQuantity(product.id, -1)}
+              onClick={() => { updateQuantity(product.id, -1); navigator.vibrate?.(10); }}
               className="w-8 h-8 flex items-center justify-center text-purple-600 active:bg-purple-50 transition-colors"
             >
               <Minus size={13} strokeWidth={3} />
@@ -103,7 +103,7 @@ export default function ProductListItem({ product }) {
               {cartItem.quantity}
             </span>
             <button
-              onClick={() => updateQuantity(product.id, 1)}
+              onClick={() => { updateQuantity(product.id, 1); navigator.vibrate?.(10); }}
               className="w-8 h-8 flex items-center justify-center bg-green-500 text-white active:bg-green-600 transition-colors"
             >
               <Plus size={13} strokeWidth={3} />
@@ -112,7 +112,7 @@ export default function ProductListItem({ product }) {
         ) : (
           /* Not in cart */
           <button
-            onClick={() => addToCart(product)}
+            onClick={() => { addToCart(product); navigator.vibrate?.(10); }}
             className="w-8 h-8 flex items-center justify-center border-2 border-purple-500 rounded-lg text-purple-600 active:bg-purple-50 transition-colors"
           >
             <Plus size={16} strokeWidth={3} />

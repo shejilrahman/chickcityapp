@@ -4,12 +4,16 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import SplashScreen from "@/components/SplashScreen";
 
+import BottomNav from "@/components/BottomNav";
+import InstallPrompt from "@/components/InstallPrompt";
+
 export default function AppShell({ children }) {
   const [splashDone, setSplashDone] = useState(false);
   const pathname = usePathname();
   
   // Admin pages should stay full-width
   const isAdmin = pathname?.startsWith("/admin");
+  const isOfflinePage = pathname === "/offline";
 
   return (
     <>
@@ -22,7 +26,11 @@ export default function AppShell({ children }) {
       ) : (
         <div className="min-h-screen bg-slate-50 flex flex-col items-center">
           <div className="w-full max-w-md min-h-screen bg-white shadow-[0_0_60px_rgba(0,0,0,0.08)] relative flex flex-col">
-            {children}
+            <div className={`flex-1 ${!isAdmin && !isOfflinePage ? "pb-20" : ""}`}>
+              {children}
+            </div>
+            {!isOfflinePage && <BottomNav />}
+            <InstallPrompt />
           </div>
         </div>
       )}

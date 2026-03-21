@@ -128,6 +128,20 @@ export default function ImageAdminPage() {
     img.src = src;
   };
 
+  const handleClear = () => {
+    setOriginalImage(null);
+    setSaveResults(null);
+    setSelectedIds(new Set());
+    setCropRect({ x: 50, y: 50, w: 200, h: 200 });
+  };
+
+  const resetBox = () => {
+    if (!canvasRef.current) return;
+    const canvas = canvasRef.current;
+    const size = Math.min(canvas.width, canvas.height) * 0.8;
+    setCropRect({ x: (canvas.width - size) / 2, y: (canvas.height - size) / 2, w: size, h: size });
+  };
+
   // GLOBAL PASTE LISTENER
   useEffect(() => {
     const handleGlobalPaste = (e) => {
@@ -190,7 +204,10 @@ export default function ImageAdminPage() {
     }));
     setSaveResults({ success: succeeded.map(s => s.id), failed });
     setIsSubmitting(false);
-    if (failed.length === 0) { setSelectedIds(new Set()); setOriginalImage(null); }
+    if (failed.length === 0) { 
+      // Auto-clear after successful save to prepare for next paste
+      setTimeout(() => handleClear(), 1500); 
+    }
   };
 
   const onMouseDown = (e) => {
@@ -349,6 +366,17 @@ export default function ImageAdminPage() {
             </div>
 
             <div className="flex items-center gap-3">
+              {originalImage && (
+                <>
+                  <button onClick={resetBox} className="flex items-center gap-2 px-3 py-2 bg-slate-800 hover:bg-slate-700 text-[10px] font-bold rounded-lg transition-all text-slate-400">
+                    <MousePointer2 size={12} /> Reset Box
+                  </button>
+                  <button onClick={handleClear} className="flex items-center gap-2 px-3 py-2 bg-red-500/10 hover:bg-red-500/20 text-[10px] font-bold rounded-lg transition-all text-red-500 border border-red-500/20">
+                    <Trash2 size={12} /> Clear
+                  </button>
+                </>
+              )}
+              <div className="h-6 w-px bg-slate-800 mx-1" />
               <button onClick={() => document.getElementById("file-upload").click()} className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold rounded-xl transition-all">
                 <Upload size={14} /> Browse
               </button>

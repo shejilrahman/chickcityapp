@@ -90,7 +90,7 @@ export default function SplashScreen({ onDone }) {
               ? "text-white [text-shadow:0_0_6px_#fff,0_0_14px_rgba(255,255,255,0.5)] animate-[flicker_0.7s_ease_forwards]" 
               : "text-white"}
           `}>
-            e3aurant
+            Family Restaurant
           </p>
         </div>
 

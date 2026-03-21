@@ -31,7 +31,7 @@ export default function SplashScreen({ onDone }) {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        background: "linear-gradient(160deg, #4c1d95 0%, #6d28d9 35%, #7c3aed 65%, #a855f7 100%)",
+        background: "linear-gradient(160deg, #7c2d12 0%, #9a3412 35%, #c2410c 65%, #ea580c 100%)",
         transition: phase === "exit" ? "opacity 0.55s ease, transform 0.55s ease" : "none",
         opacity: phase === "exit" ? 0 : 1,
         transform: phase === "exit" ? "scale(1.04)" : "scale(1)",
@@ -49,16 +49,6 @@ export default function SplashScreen({ onDone }) {
         width: "240px", height: "240px", borderRadius: "50%",
         background: "rgba(255,255,255,0.05)",
       }} />
-      <div style={{
-        position: "absolute", top: "30%", left: "10%",
-        width: "80px", height: "80px", borderRadius: "50%",
-        border: "1.5px solid rgba(255,255,255,0.12)",
-      }} />
-      <div style={{
-        position: "absolute", bottom: "25%", right: "8%",
-        width: "50px", height: "50px", borderRadius: "50%",
-        border: "1.5px solid rgba(255,255,255,0.10)",
-      }} />
 
       {/* Main content */}
       <div style={{
@@ -67,55 +57,57 @@ export default function SplashScreen({ onDone }) {
       }}>
         {/* Logo icon */}
         <div style={{
-          width: "96px", height: "96px", borderRadius: "28px",
+          width: "110px", height: "110px", borderRadius: "32px",
           background: "rgba(255,255,255,0.15)",
           backdropFilter: "blur(12px)",
           border: "1.5px solid rgba(255,255,255,0.28)",
           display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: "48px",
+          fontSize: "52px",
           boxShadow: "0 16px 48px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.25)",
-          marginBottom: "24px",
+          marginBottom: "28px",
         }}>
-          🛒
+          🍗
         </div>
 
         {/* Store name */}
         <h1 style={{
           color: "#fff",
-          fontSize: "34px",
-          fontWeight: "900",
-          letterSpacing: "-0.5px",
+          fontSize: "42px",
+          fontWeight: "950",
+          letterSpacing: "-1.5px",
           lineHeight: 1,
-          marginBottom: "6px",
-          textShadow: "0 2px 12px rgba(0,0,0,0.18)",
+          marginBottom: "8px",
+          textShadow: "0 4px 16px rgba(0,0,0,0.25)",
+          textTransform: "uppercase",
         }}>
-          Palathingal
+          Chick City
         </h1>
 
-        {/* "Stores" badge */}
+        {/* "Restaurant" badge */}
         <div style={{
-          display: "inline-flex", alignItems: "center", gap: "4px",
+          display: "inline-flex", alignItems: "center", gap: "6px",
           background: "rgba(255,255,255,0.18)",
           border: "1px solid rgba(255,255,255,0.28)",
           borderRadius: "20px",
-          padding: "3px 12px",
-          marginBottom: "16px",
+          padding: "4px 16px",
+          marginBottom: "20px",
         }}>
-          <span style={{ fontSize: "12px" }}>✨</span>
-          <span style={{ color: "#fff", fontSize: "13px", fontWeight: "700", letterSpacing: "0.5px" }}>
-            STORES
+          <span style={{ fontSize: "14px" }}>⭐</span>
+          <span style={{ color: "#fff", fontSize: "14px", fontWeight: "800", letterSpacing: "1px" }}>
+            RESTAURANT
           </span>
         </div>
 
         {/* Tagline */}
         <p style={{
-          color: "rgba(255,255,255,0.70)",
-          fontSize: "14px",
-          fontWeight: "500",
-          letterSpacing: "0.3px",
+          color: "rgba(255,255,255,0.85)",
+          fontSize: "15px",
+          fontWeight: "600",
+          letterSpacing: "0.5px",
         }}>
-          Fresh · Local · Fast
+          Original Arabic Mandi & Grills
         </p>
+
       </div>
 
       {/* Loading dots at the bottom */}

@@ -31,7 +31,7 @@ export default function RootLayout({ children }) {
       <head>
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
       </head>
-      <body className={`${inter.variable} ${manjari.variable} font-sans antialiased bg-gray-50 text-gray-900`}>
+      <body className={`${inter.variable} ${manjari.variable} font-sans antialiased bg-slate-100 text-slate-900`}>
         <CartProvider>
           <AppShell>
             {children}

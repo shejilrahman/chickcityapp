@@ -150,44 +150,57 @@ export default function Home() {
         <div
           className="relative overflow-hidden px-4 pt-4 pb-5"
           style={{
-            background: "linear-gradient(135deg, #064e3b 0%, #065f46 40%, #059669 80%, #10b981 100%)",
+            background: "linear-gradient(135deg, #064e3b 0%, #065f46 40%, #059669 80%, #047857 100%)",
           }}
         >
+          {/* 🌙 Eid Mubarak Decorative Elements */}
+          <div className="absolute top-2 right-4 flex flex-col items-center">
+            <span className="text-3xl drop-shadow-[0_0_15px_rgba(251,191,36,0.6)] animate-pulse">🌙</span>
+            <span className="text-[10px] font-black text-amber-400 tracking-tighter uppercase mt-[-4px]">Eid Mubarak</span>
+          </div>
+          
+          <div className="absolute top-8 left-1/2 -translate-x-1/2 opacity-10 pointer-events-none select-none">
+            <span className="text-[80px]">🕌</span>
+          </div>
+
+          <div className="absolute top-2 left-6 animate-bounce" style={{ animationDuration: "3s" }}>
+            <span className="text-xl opacity-60">🏮</span>
+          </div>
+          <div className="absolute top-12 right-24 animate-bounce" style={{ animationDuration: "4s" }}>
+            <span className="text-lg opacity-40">🏮</span>
+          </div>
+
           {/* Animated background blobs */}
           <div
-            className="blob absolute -top-6 -right-6 w-40 h-40 rounded-full opacity-20"
-            style={{ background: "radial-gradient(circle, #ffffff 0%, transparent 70%)" }}
+            className="blob absolute -top-10 -right-10 w-48 h-48 rounded-full opacity-30"
+            style={{ background: "radial-gradient(circle, #fbbf24 0%, transparent 70%)" }}
           />
           <div
-            className="blob blob-delay absolute bottom-0 left-1/3 w-28 h-28 rounded-full opacity-15"
-            style={{ background: "radial-gradient(circle, #a7f3d0 0%, transparent 70%)" }}
+            className="blob blob-delay absolute bottom-[-20px] left-[-20px] w-32 h-32 rounded-full opacity-20"
+            style={{ background: "radial-gradient(circle, #fcd34d 0%, transparent 70%)" }}
           />
-          {/* Decorative circles */}
-          <div className="absolute top-3 right-14 w-8 h-8 border border-white/20 rounded-full" />
-          <div className="absolute top-6 right-20 w-4 h-4 border border-white/15 rounded-full" />
-          <div className="absolute bottom-3 left-4 w-5 h-5 border border-white/20 rounded-full" />
 
           {/* Top row: logo + orders */}
-          <div className="relative flex items-center justify-between mb-4">
+          <div className="relative flex items-center justify-between mb-4 mt-2">
             <div className="flex items-center gap-3">
               {/* Store icon */}
-              <div className="w-11 h-11 bg-white/20 backdrop-blur-sm border border-white/30 rounded-2xl flex items-center justify-center shadow-lg">
-                <span className="text-2xl">🍗</span>
+              <div className="w-12 h-12 bg-white/20 backdrop-blur-md border border-white/30 rounded-2xl flex items-center justify-center shadow-xl relative overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-tr from-amber-400/20 to-transparent" />
+                <span className="text-2xl relative z-10 transition-transform group-active:scale-95">🍗</span>
               </div>
 
               <div>
                 <div className="flex items-center gap-1.5">
-                  <h1 className="text-white font-black text-[19px] tracking-tight leading-none">
+                  <h1 className="text-white font-black text-[21px] tracking-tight leading-none drop-shadow-md">
                     Chick City
                   </h1>
-                  {/* Verified-store badge like Zepto */}
-                  <span className="bg-white/25 border border-white/30 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5">
-                    <Sparkles size={9} strokeWidth={2.5} />
-                    Restaurant
+                  <span className="bg-amber-400/20 border border-amber-400/30 text-amber-400 text-[9px] font-black px-1.5 py-0.5 rounded-full flex items-center gap-0.5 uppercase tracking-wider shadow-sm">
+                    <Sparkles size={8} strokeWidth={3} />
+                    Eid Special
                   </span>
                 </div>
-                <p className="text-emerald-200 text-[11.5px] font-medium mt-0.5 tracking-wide">
-                  Fresh • Local • Fast
+                <p className="text-emerald-200/80 text-[11px] font-bold mt-1 tracking-wider uppercase">
+                  Original Arabic Mandi & Grills
                 </p>
               </div>
             </div>

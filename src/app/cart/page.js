@@ -9,6 +9,9 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, Trash2, Plus, Minus, Send, MapPin, Loader2, ShoppingBag, Lock, AlertTriangle } from "lucide-react";
 import Image from "next/image";
 import { WEIGHT_SLABS, getSlabPrice, formatGrams } from "@/lib/weight-slabs";
+import dynamic from "next/dynamic";
+
+const MapPicker = dynamic(() => import("@/components/MapPicker"), { ssr: false });
 
 const MIN_ORDER = 300;
 
@@ -21,8 +24,8 @@ export default function CartPage() {
   const [location, setLocation] = useState("");
   const [landmark, setLandmark] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLocating, setIsLocating] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
+  const [showMap, setShowMap] = useState(false);
 
   useEffect(() => {
     const savedDetails = localStorage.getItem("grocery-customer");
@@ -39,21 +42,6 @@ export default function CartPage() {
     }
     setIsHydrated(true);
   }, []);
-
-  const handleGetLocation = () => {
-    if (!navigator.geolocation) { alert("Geolocation not supported."); return; }
-    setIsLocating(true);
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const { latitude, longitude } = pos.coords;
-        const link = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
-        setLocation(prev => prev ? `${prev}\n${link}` : link);
-        setIsLocating(false);
-      },
-      () => { alert("Failed to get location."); setIsLocating(false); },
-      { enableHighAccuracy: true }
-    );
-  };
 
   const handleOrder = async (e) => {
     e.preventDefault();
@@ -262,15 +250,16 @@ export default function CartPage() {
               <div className="flex justify-between items-center mb-1.5">
                 <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Delivery Address</label>
                 <button
-                  type="button" onClick={handleGetLocation} disabled={isLocating}
-                  className="text-xs font-bold text-green-700 bg-green-50 border border-green-200 px-2.5 py-1.5 rounded-xl flex items-center gap-1.5 active:bg-green-100 transition-colors disabled:opacity-50"
+                  type="button"
+                  onClick={() => setShowMap(true)}
+                  className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1.5 rounded-xl flex items-center gap-1.5 active:bg-emerald-100 transition-colors"
                 >
-                  {isLocating ? <Loader2 size={11} className="animate-spin" /> : <MapPin size={11} />}
-                  {isLocating ? "Locating..." : "Use GPS"}
+                  <MapPin size={11} />
+                  Pin on Map
                 </button>
               </div>
               <textarea
-                required rows="2" placeholder="Full address or Google Maps link"
+                required rows="2" placeholder="Full address or tap 'Pin on Map'"
                 value={location} onChange={(e) => setLocation(e.target.value)}
                 className="w-full px-4 py-3.5 bg-white border border-gray-200 rounded-2xl text-[15px] text-gray-900 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
               />
@@ -309,6 +298,17 @@ export default function CartPage() {
           </div>
         )}
       </div>
+
+      {/* Map Picker Overlay */}
+      {showMap && (
+        <MapPicker
+          onConfirm={(addr) => {
+            setLocation(addr);
+            setShowMap(false);
+          }}
+          onCancel={() => setShowMap(false)}
+        />
+      )}
     </div>
   );
 }

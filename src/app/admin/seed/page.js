@@ -9,7 +9,6 @@ export default function SeedPage() {
   const [result, setResult] = useState(null);
 
   const runSeed = async () => {
-    if (!confirm("This will add 8 categories and 57 products to Firestore.\n\nRun only ONCE — running again will create duplicates.\n\nContinue?")) return;
     setStatus("loading");
     try {
       const res = await fetch("/api/seed", { method: "POST" });

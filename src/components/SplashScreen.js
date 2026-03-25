@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 
 /* ──────────────────────────────────────────────────────────────────────────
    Enhanced Splash Screen for Noor Al Mandi
@@ -106,18 +107,27 @@ export default function SplashScreen({ onDone }) {
 
         {/* HERO CHEF MASCOT – the star of the new splash */}
         <div className={`mb-4 sm:mb-8 transition-all duration-1000 ${phase >= 1 ? "opacity-100 scale-100" : "opacity-0 scale-75"}`}>
-          <img
-            src="person.png"
-            alt="Noor Al Mandi Hero Chef"
-            className="w-[50vw] max-w-[240px] sm:max-w-[310px] h-auto mx-auto"
+          <div
+            className="w-[50vw] max-w-[240px] sm:max-w-[310px] mx-auto relative"
             style={{
+              // Use aspect ratio block for next/image
+              aspectRatio: "1/1",
               filter: `
                 drop-shadow(0 25px 20px rgba(201,162,39,0.55))
                 drop-shadow(0 0 35px rgba(245,209,113,0.4))
               `,
               transition: "filter 1.2s cubic-bezier(0.4, 0, 0.2, 1)",
             }}
-          />
+          >
+            <Image
+              src="/person.png"
+              alt="Noor Al Mandi Hero Chef"
+              fill
+              className="object-contain"
+              sizes="(max-width: 640px) 240px, 310px"
+              priority
+            />
+          </div>
         </div>
 
         {/* Brand Name – appears after chef for perfect hierarchy */}

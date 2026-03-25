@@ -19,7 +19,7 @@ export default function Home() {
   const [allCategories, setAllCategories] = useState([]); // fetched from Firestore
   const [productsLoaded, setProductsLoaded] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedCategory, setSelectedCategory] = useState("All Menu");
   const [pastItems, setPastItems] = useState([]);
   const [isHydrated, setIsHydrated] = useState(false);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
@@ -57,27 +57,31 @@ export default function Home() {
 
   const categories = useMemo(() => {
     const activeFromProducts = Array.from(new Set(allProducts.map((p) => p.category)));
-    const enriched = allCategories.filter(c => activeFromProducts.includes(c.title) || c.id === "all" || c.title === "All");
+    const enriched = allCategories.filter(c => activeFromProducts.includes(c.title) || c.id === "all" || c.title === "All" || c.title === "All Menu");
     
-    // Find the Firestore "All" category if it exists
-    const dbAll = allCategories.find(c => c.id === "all" || c.title === "All");
+    // Find the Firestore "All/All Menu" category if it exists
+    const dbAll = allCategories.find(c => c.id === "all" || c.title === "All" || c.title === "All Menu");
     
-    // Final "All" item: prefers Firestore data, fallbacks to hardcoded
-    const finalAll = dbAll || { id: "all", title: "All", emoji: "🍗" };
+    // Final "All Menu" item: prefers Firestore data, fallbacks to hardcoded
+    const finalAll = dbAll || { 
+      id: "all", 
+      title: "All Menu", 
+      image: "/categories/all-menu.jpg"
+    };
     
-    // Filter out categories that are not "All" but are active in products
-    const others = enriched.filter(c => c.title !== "All" && c.id !== "all");
+    // Filter out categories that are not the "All" item
+    const others = enriched.filter(c => c.title !== "All" && c.title !== "All Menu" && c.id !== "all");
     
     return [finalAll, ...others];
   }, [allProducts, allCategories]);
 
   const filteredProducts = useMemo(() => {
     const categoryFiltered = allProducts.filter(p =>
-      selectedCategory === "All" || p.category === selectedCategory
+      selectedCategory === "All Menu" || p.category === selectedCategory
     );
 
     if (!searchTerm.trim()) {
-      if (selectedCategory === "All") {
+      if (selectedCategory === "All Menu") {
         const featured = categoryFiltered.filter(p => p.featured);
         const rest     = categoryFiltered.filter(p => !p.featured);
         return [...featured, ...rest];
@@ -261,7 +265,7 @@ export default function Home() {
             <h2 className="text-[13px] font-bold text-green-900">
               {isSearching
                 ? `Results for "${searchTerm}"`
-                : selectedCategory === "All"
+                : selectedCategory === "All Menu"
                 ? "✨ All Products"
                 : selectedCategory.charAt(0) + selectedCategory.slice(1).toLowerCase()}
             </h2>

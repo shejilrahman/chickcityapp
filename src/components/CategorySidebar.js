@@ -24,7 +24,7 @@ export default function CategorySidebar({ categories, selectedCategory, setSelec
         const title = cat.title || cat;
         const isActive = selectedCategory === title;
         const emoji = cat.emoji || categoryEmoji[title] || "📦";
-        const label = title === "All" ? "All" : title.charAt(0) + title.slice(1).toLowerCase();
+        const label = (title === "All" || title === "All Menu") ? "All Menu" : title.charAt(0) + title.slice(1).toLowerCase();
         const image = cat.image;
 
         return (

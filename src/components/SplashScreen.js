@@ -158,7 +158,7 @@ export default function SplashScreen({ onDone }) {
             textTransform: "uppercase",
             fontWeight: 700,
           }}>
-          Original Arabic Mandi · Al Fahm · Grills
+           Arabic Mandi · Al Fahm · Grills
         </p>
 
         {/* ── HALAL badge + location ── */}

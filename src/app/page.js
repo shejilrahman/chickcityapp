@@ -195,7 +195,7 @@ export default function Home() {
                   </div>
                 </div>
                 <p className="text-[10px] font-semibold mt-0.5 tracking-widest uppercase" style={{ color: "rgba(201,162,39,0.7)" }}>
-                  Original Arabic Mandi · Grills · Al Fahm
+                   Arabic Mandi · Grills · Al Fahm
                 </p>
               </div>
             </div>

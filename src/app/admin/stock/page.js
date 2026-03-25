@@ -44,7 +44,9 @@ export default function StockAdminPage() {
       ]);
       const prodData = await prodRes.json();
       const catData = await catRes.json();
-      const formatted = prodData.map(p => ({
+      // Filter out hidden products before initializing stock
+      const activeProducts = prodData.filter(p => !p.hidden);
+      const formatted = activeProducts.map(p => ({
         ...p,
         stockCount: p.stockCount !== undefined ? p.stockCount : DEFAULT_STOCK
       }));

@@ -27,7 +27,7 @@ export async function POST(request) {
       isBestseller: Boolean(isBestseller),
       isFeatured: false,
       isAvailable: isAvailable !== false,
-      hidden: false,
+      hidden: isAvailable === false,
       spiceLevel: spiceLevel || "Medium",
       portionSlab: portionSlab || null,
       tags: tags || [],

@@ -212,7 +212,7 @@ export default function Home() {
           <div className="relative flex items-center gap-2 mb-3 overflow-x-auto hide-scrollbar">
             {[
               { emoji: "🚀", text: "30-45 min" },
-              { emoji: "📍", text: "5 km radius" },
+              { emoji: "📍", text: "10 km radius" },
               { emoji: "🥡", text: "Min ₹300" },
             ].map((p, i) => (
               <div key={i} className="flex-shrink-0 flex items-center gap-1 rounded-full px-2.5 py-1" style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(201,162,39,0.25)" }}>

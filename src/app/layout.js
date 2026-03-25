@@ -1,17 +1,21 @@
-import { Inter, Manjari } from "next/font/google";
+import { Amiri, Cinzel } from "next/font/google";
 import { CartProvider } from "@/components/CartContext";
 import AppShell from "@/components/AppShell";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const manjari = Manjari({
-  weight: ["100", "400", "700"],
-  subsets: ["malayalam"],
-  variable: "--font-manjari",
+const cinzel = Cinzel({
+  subsets: ["latin"],
+  weight: ["400", "700", "900"],
+  variable: "--font-cinzel",
+});
+const amiri = Amiri({
+  subsets: ["arabic", "latin"],
+  weight: ["400", "700"],
+  variable: "--font-amiri",
 });
 
 export const viewport = {
-  themeColor: "#065f46",
+  themeColor: "#0f1b5c",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -38,7 +42,7 @@ export default function RootLayout({ children }) {
       <head>
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
       </head>
-      <body className={`${inter.variable} ${manjari.variable} font-sans antialiased bg-slate-100 text-slate-900`}>
+      <body className={`${cinzel.variable} ${amiri.variable} font-sans antialiased bg-slate-100 text-slate-900`}>
         <CartProvider>
           <AppShell>
             {children}

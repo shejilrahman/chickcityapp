@@ -144,44 +144,57 @@ export default function Home() {
         <div
           className="relative overflow-hidden px-4 pt-3 pb-3"
           style={{
-            background: "linear-gradient(160deg, #022c22 0%, #064e3b 45%, #065f46 100%)",
+            background: "linear-gradient(160deg, #070e38 0%, #0f1b5c 45%, #1a2a80 100%)",
           }}
         >
-          {/* ── Decorative Arabic pattern overlay ── */}
-          <div className="absolute inset-0 opacity-[0.04]" style={{
-            backgroundImage: `repeating-linear-gradient(45deg, #fbbf24 0, #fbbf24 1px, transparent 0, transparent 50%)`,
-            backgroundSize: "20px 20px",
+          {/* ── Islamic geometric pattern overlay ── */}
+          <div className="absolute inset-0" style={{
+            backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 18px, rgba(201,162,39,0.04) 19px, rgba(201,162,39,0.04) 20px),
+              repeating-linear-gradient(-45deg, transparent, transparent 18px, rgba(201,162,39,0.04) 19px, rgba(201,162,39,0.04) 20px)`,
           }} />
 
+          {/* ── Gold rule top ── */}
+          <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: "linear-gradient(90deg, transparent, #c9a227 40%, #f5d171 60%, #c9a227 80%, transparent)" }} />
+
           {/* ── Glowing crescent top-right ── */}
-          <div className="absolute -top-4 -right-4 w-28 h-28 opacity-15 pointer-events-none">
+          <div className="absolute -top-4 -right-4 w-28 h-28 opacity-20 pointer-events-none">
             <svg viewBox="0 0 100 100" fill="none">
-              <circle cx="50" cy="50" r="44" fill="#fbbf24" />
-              <circle cx="64" cy="38" r="36" fill="#022c22" />
+              <circle cx="50" cy="50" r="44" fill="#c9a227" />
+              <circle cx="64" cy="38" r="36" fill="#070e38" />
             </svg>
           </div>
 
-          {/* ── Subtle stars ── */}
-          {["top-2 left-[15%]", "top-5 left-[45%]", "top-1 right-[20%]"].map((pos, i) => (
-            <span key={i} className={`absolute ${pos} text-amber-400/40 text-xs animate-pulse`} style={{ animationDelay: `${i * 0.7}s` }}>✦</span>
+          {/* ── Gold stars ── */}
+          {["top-2 left-[15%]", "top-5 left-[45%]", "top-1 right-[22%]"].map((pos, i) => (
+            <span key={i} className={`absolute ${pos} text-amber-400/50 text-xs animate-pulse`} style={{ animationDelay: `${i * 0.7}s` }}>✦</span>
           ))}
 
-          {/* ── TOP ROW: brand + orders ── */}
           <div className="relative flex items-center justify-between mb-2.5">
             {/* Brand */}
             <div className="flex items-center gap-2.5">
               <div>
                 <div className="flex items-center gap-2">
-                  <h1 className="text-white font-black text-[22px] tracking-tight leading-none drop-shadow-md">
+                  <h1
+                    style={{
+                      fontFamily: "var(--font-cinzel), 'Cinzel', Georgia, serif",
+                      fontSize: "20px",
+                      fontWeight: 900,
+                      letterSpacing: "0.04em",
+                      lineHeight: 1,
+                      color: "#ffffff",
+                      textShadow: "0 0 12px rgba(201,162,39,0.5), 0 1px 4px rgba(0,0,0,0.6)",
+                      margin: 0,
+                    }}
+                  >
                     Noor al Mandi
                   </h1>
-                  {/* Eid badge */}
-                  <div className="flex items-center gap-1 bg-amber-400/20 border border-amber-400/40 rounded-full px-2 py-0.5">
-                    <span className="text-[11px]">🌙</span>
-                    <span className="text-amber-300 text-[9px] font-black uppercase tracking-wider">Eid Special</span>
+                  {/* Halal badge */}
+                  <div className="flex items-center gap-1 rounded-full px-2 py-0.5" style={{ background: "rgba(201,162,39,0.18)", border: "1px solid rgba(201,162,39,0.45)" }}>
+                    <span className="text-[10px]">☪</span>
+                    <span className="text-[9px] font-black uppercase tracking-wider" style={{ color: "#f5d171" }}>Halal</span>
                   </div>
                 </div>
-                <p className="text-emerald-300/70 text-[10px] font-semibold mt-0.5 tracking-widest uppercase">
+                <p className="text-[10px] font-semibold mt-0.5 tracking-widest uppercase" style={{ color: "rgba(201,162,39,0.7)" }}>
                   Original Arabic Mandi · Grills · Al Fahm
                 </p>
               </div>
@@ -196,23 +209,21 @@ export default function Home() {
             </Link>
           </div>
 
-          {/* ── PROMISE BADGES ROW — one line, compact ── */}
           <div className="relative flex items-center gap-2 mb-3 overflow-x-auto hide-scrollbar">
             {[
               { emoji: "🚀", text: "30-45 min" },
               { emoji: "📍", text: "5 km radius" },
               { emoji: "🥡", text: "Min ₹300" },
             ].map((p, i) => (
-              <div key={i} className="flex-shrink-0 flex items-center gap-1 bg-white/10 border border-white/15 rounded-full px-2.5 py-1">
+              <div key={i} className="flex-shrink-0 flex items-center gap-1 rounded-full px-2.5 py-1" style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(201,162,39,0.25)" }}>
                 <span className="text-[12px]">{p.emoji}</span>
-                <span className="text-white/90 text-[10px] font-semibold whitespace-nowrap">{p.text}</span>
+                <span className="text-[10px] font-semibold whitespace-nowrap" style={{ color: "rgba(255,255,255,0.85)" }}>{p.text}</span>
               </div>
             ))}
-            {/* Decorative divider + Eid text */}
             <div className="flex-shrink-0 flex items-center gap-1 ml-auto">
-              <span className="text-amber-400/60 text-[10px]">✦</span>
-              <span className="text-amber-300/80 text-[10px] font-bold tracking-widest uppercase">Eid Mubarak</span>
-              <span className="text-amber-400/60 text-[10px]">✦</span>
+              <span style={{ color: "rgba(201,162,39,0.7)", fontSize: "10px" }}>✦</span>
+              <span className="text-[10px] font-bold tracking-widest uppercase" style={{ color: "rgba(201,162,39,0.85)" }}>Thriprayar</span>
+              <span style={{ color: "rgba(201,162,39,0.7)", fontSize: "10px" }}>✦</span>
             </div>
           </div>
 

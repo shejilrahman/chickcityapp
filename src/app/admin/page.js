@@ -66,13 +66,7 @@ const ADMIN_PAGES = [
     desc: "Upload & crop photos for menu items",
     color: "from-purple-500 to-violet-600",
   },
-  {
-    href: "/admin/weight-slabs",
-    icon: Scale,
-    label: "Portion Slabs",
-    desc: "Manage Qtr / Half / Full pricing slabs",
-    color: "from-amber-500 to-yellow-500",
-  },
+
   {
     href: "/admin/featured",
     icon: Star,

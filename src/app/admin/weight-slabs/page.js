@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import {
   Search,
   Scale,
@@ -37,18 +37,25 @@ export default function WeightSlabAdminPage() {
   const searchTimerRef = useRef(null);
 
   // --- Data loading ---
-  useEffect(() => {
-    Promise.all([
-      fetch("/api/products").then((r) => r.json()),
-      fetch("/api/categories").then((r) => r.json()),
-    ])
-      .then(([prods, cats]) => {
-        setProducts(prods);
-        setCategories(cats);
-        setIsLoaded(true);
-      })
-      .catch((e) => { setError(e.message); setIsLoaded(true); });
+  const load = useCallback(async () => {
+    setIsLoaded(false);
+    try {
+      const [prods, cats] = await Promise.all([
+        fetch("/api/products").then((r) => r.json()),
+        fetch("/api/categories").then((r) => r.json()),
+      ]);
+      setProducts(prods);
+      setCategories(cats);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setIsLoaded(true);
+    }
   }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   // --- Filter ---
   useEffect(() => {

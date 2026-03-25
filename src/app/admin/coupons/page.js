@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Plus, Loader2, Save, X, Trash2, ToggleLeft, ToggleRight, Tag } from "lucide-react";
 import AdminNav from "@/components/AdminNav";
 
@@ -16,9 +16,7 @@ export default function CouponsPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toast, setToast] = useState(null);
 
-  useEffect(() => { load(); }, [load]);
-
-  async function load() {
+  const load = useCallback(async () => {
     setIsLoaded(false);
     try {
       const res = await fetch("/api/coupons/list");
@@ -29,7 +27,9 @@ export default function CouponsPage() {
     } finally {
       setIsLoaded(true);
     }
-  }
+  }, []);
+
+  useEffect(() => { load(); }, [load]);
 
   const showToast = (msg) => {
     setToast(msg);

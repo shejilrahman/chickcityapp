@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Search, Star, Loader2, CheckSquare, Square, Save, Filter } from "lucide-react";
 import AdminNav from "@/components/AdminNav";
 

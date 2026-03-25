@@ -10,7 +10,7 @@ const links = [
   { href: "/admin/settings",     icon: Settings,        label: "Settings" },
   { href: "/admin/coupons",      icon: Tag,             label: "Coupons" },
   { href: "/admin/images",       icon: ImageIcon,       label: "Images" },
-  { href: "/admin/weight-slabs", icon: Scale,           label: "Slabs" },
+  // { href: "/admin/weight-slabs", icon: Scale,           label: "Slabs" },
   { href: "/admin/featured",     icon: Star,            label: "Featured" },
   { href: "/admin/hidden",       icon: EyeOff,          label: "Hidden" },
 ];

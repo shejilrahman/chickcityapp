@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Plus, Edit3, Trash2, Loader2, Save, X, ArrowUp, ArrowDown, CheckCircle, XCircle
 } from "lucide-react";
@@ -18,12 +18,10 @@ export default function CategoriesAdminPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toast, setToast] = useState(null);
 
-  useEffect(() => { load(); }, [load]);
-
-  async function load() {
+  const load = useCallback(async () => {
     setIsLoaded(false);
     try {
-      const res = await fetch("/api/categories/get");
+      const res = await fetch("/api/categories");
       const data = await res.json();
       setCategories(Array.isArray(data) ? data : []);
     } catch (e) {
@@ -31,7 +29,9 @@ export default function CategoriesAdminPage() {
     } finally {
       setIsLoaded(true);
     }
-  }
+  }, []);
+
+  useEffect(() => { load(); }, [load]);
 
   const showToast = (msg) => {
     setToast(msg);

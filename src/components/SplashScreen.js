@@ -76,7 +76,7 @@ export default function SplashScreen({ onDone }) {
               ? "text-[#e8281a] [text-shadow:0_0_8px_#e8281a,0_0_20px_#e8281a,0_0_40px_rgba(232,40,26,0.6)] animate-[flicker_0.6s_ease_forwards]" 
               : "text-[#1a0a0a]"}
           `}>
-            Chick City
+            ABC 
           </h1>
 
           <div className={`flex items-center justify-center gap-[6px] my-[8px] transition-opacity duration-800 ${showOtherElements ? "opacity-100" : "opacity-0"}`}>

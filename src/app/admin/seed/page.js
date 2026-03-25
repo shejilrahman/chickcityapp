@@ -34,7 +34,7 @@ export default function SeedPage() {
           <h1 className="text-2xl font-black">Database Seeder</h1>
           <p className="text-slate-500 mt-2 text-sm">
             Populate Firestore with <strong className="text-slate-300">8 categories</strong> and{" "}
-            <strong className="text-slate-300">57 menu items</strong> for Chick City.
+            <strong className="text-slate-300">57 menu items</strong> for ABC .
           </p>
         </div>
 

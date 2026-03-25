@@ -8,7 +8,7 @@ export async function POST(request) {
 
     // Sanitize and type-cast
     const clean = {
-      shopName: settings.shopName || "Chick City",
+      shopName: settings.shopName || "ABC ",
       whatsappNumber: settings.whatsappNumber || "",
       address: settings.address || "",
       openingTime: settings.openingTime || "10:00",

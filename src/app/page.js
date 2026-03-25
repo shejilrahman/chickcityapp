@@ -173,7 +173,7 @@ export default function Home() {
               <div>
                 <div className="flex items-center gap-2">
                   <h1 className="text-white font-black text-[22px] tracking-tight leading-none drop-shadow-md">
-                    Chick City
+                    ABC 
                   </h1>
                   {/* Eid badge */}
                   <div className="flex items-center gap-1 bg-amber-400/20 border border-amber-400/40 rounded-full px-2 py-0.5">

@@ -19,13 +19,13 @@ export const viewport = {
 };
 
 export const metadata = {
-  title: "Chick City Restaurant App",
+  title: "ABC  Restaurant App",
   description: "Order hot & fresh food via WhatsApp",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Chick City",
+    title: "ABC ",
   },
   formatDetection: {
     telephone: false,

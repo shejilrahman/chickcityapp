@@ -252,7 +252,7 @@ export default function Home() {
                 {[
                   { e: "🚀", t: "30–45 min" },
                   { e: "📍", t: "10 km" },
-                  { e: "🥡", t: "Min ₹300" },
+                  { e: "🥡", t: "Min ₹100" },
                   { e: "📍", t: "Thriprayar" },
                 ].map((p, i) => (
                   <div key={i} className="flex items-center gap-1 rounded-full px-2 py-0.5" style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(201,162,39,0.2)" }}>
@@ -272,7 +272,7 @@ export default function Home() {
             {[
               { e: "🚀", t: "30–45 min" },
               { e: "📍", t: "10 km" },
-              { e: "🥡", t: "Min ₹300" },
+              { e: "🥡", t: "Min ₹100" },
               { e: "📍", t: "Thriprayar" },
             ].map((p, i) => (
               <div key={i} className="flex-shrink-0 flex items-center gap-1 rounded-full px-2 py-0.5" style={{ background: "rgba(255,255,255,0.07)", border: "1px solid rgba(201,162,39,0.2)" }}>

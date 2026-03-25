@@ -5,7 +5,7 @@ import { Lock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 
-const MIN_ORDER = 300;
+const MIN_ORDER = 100;
 
 export default function CartDrawer() {
   const { totalItems, totalPrice } = useCart();

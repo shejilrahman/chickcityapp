@@ -10,7 +10,7 @@ import dynamic from "next/dynamic";
 
 const MapPicker = dynamic(() => import("@/components/MapPicker"), { ssr: false });
 
-const MIN_ORDER = 300;
+const MIN_ORDER = 100;
 
 const PORTION_LABELS = { qtr: "Qtr", half: "Half", full: "Full" };
 const RICE_LABELS = { withRice: "With Rice", meatOnly: "Meat Only" };

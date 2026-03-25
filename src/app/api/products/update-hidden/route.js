@@ -14,7 +14,11 @@ export async function POST(req) {
 
     await Promise.all(
       updates.map(({ id, hidden }) =>
-        updateDoc(doc(db, "products", id.toString()), { hidden: !!hidden })
+        updateDoc(doc(db, "products", String(id)), { 
+          hidden: !!hidden,
+          isAvailable: !hidden,
+          updatedAt: new Date(),
+        })
       )
     );
 

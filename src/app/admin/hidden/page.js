@@ -79,7 +79,7 @@ export default function HiddenProductsPage() {
 
   const handleSave = async () => {
     const updates = Object.entries(pendingChanges).map(([id, hidden]) => ({
-      id: Number(id),
+      id, // Do not cast to Number, Firestore IDs are strings
       hidden,
     }));
     if (updates.length === 0) return;

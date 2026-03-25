@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { MapPin, Check, Loader2 } from "lucide-react";
 
 /**
@@ -15,7 +15,7 @@ export default function MapPicker({ onConfirm, onCancel }) {
   const [address, setAddress] = useState("");
   const [isGeocoding, setIsGeocoding] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
-  const [latlng, setLatlng] = useState({ lat: 10.440528, lng: 76.094781}); // Default: Talikulam, Kerala
+  const [latlng, setLatlng] = useState({ lat: 10.420439, lng: 76.104856 }); // Default: Thriprayar, Kerala
 
   // Reverse geocode using Nominatim (completely free)
   const reverseGeocode = useCallback(async (lat, lng) => {

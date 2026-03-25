@@ -11,7 +11,7 @@ export function CartProvider({ children }) {
   // Load from localStorage
   useEffect(() => {
     setIsMounted(true);
-    const saved = localStorage.getItem("grocery-cart");
+    const saved = localStorage.getItem("restaurant-cart");
     if (saved) {
       try {
         setCart(JSON.parse(saved));
@@ -24,7 +24,7 @@ export function CartProvider({ children }) {
   // Save to localStorage
   useEffect(() => {
     if (isMounted) {
-      localStorage.setItem("grocery-cart", JSON.stringify(cart));
+      localStorage.setItem("restaurant-cart", JSON.stringify(cart));
     }
   }, [cart, isMounted]);
 

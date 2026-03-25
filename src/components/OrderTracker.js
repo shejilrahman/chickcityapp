@@ -19,7 +19,7 @@ export default function OrderTracker() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const pastOrderIds = JSON.parse(localStorage.getItem("grocery-orders") || "[]");
+    const pastOrderIds = JSON.parse(localStorage.getItem("restaurant-orders") || "[]");
     if (pastOrderIds.length === 0) {
       setLoading(false);
       return;

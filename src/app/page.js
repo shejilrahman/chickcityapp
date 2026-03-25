@@ -46,7 +46,7 @@ export default function Home() {
 
   useEffect(() => {
     try {
-      const history = JSON.parse(localStorage.getItem("grocery-history") || "[]");
+      const history = JSON.parse(localStorage.getItem("restaurant-history") || "[]");
       setPastItems(history);
     } catch (e) {
       console.error("Failed to load history", e);

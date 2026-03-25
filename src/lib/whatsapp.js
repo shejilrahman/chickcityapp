@@ -1,4 +1,4 @@
-export const generateWhatsAppMessage = (items, total, name, phone, location, landmark) => {
+export const generateWhatsAppMessage = (items, total, name, phone, location, landmark, paymentStatus = "") => {
   const number = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "8891930562";
   const shopName = process.env.NEXT_PUBLIC_SHOP_NAME || "Noor al Mandi";
 
@@ -19,6 +19,10 @@ export const generateWhatsAppMessage = (items, total, name, phone, location, lan
   }
   if (landmark) {
     message += `🏢 Landmark: ${landmark}\n`;
+  }
+
+  if (paymentStatus) {
+    message += `\n💳 *Payment Status: ${paymentStatus}*\n`;
   }
 
   message += `\n_Sent via ${shopName} App_`;

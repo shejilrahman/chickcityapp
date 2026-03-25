@@ -26,9 +26,10 @@ export default function CartPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
   const [showMap, setShowMap] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("whatsapp"); // "whatsapp" | "gpay"
 
   useEffect(() => {
-    const savedDetails = localStorage.getItem("grocery-customer");
+    const savedDetails = localStorage.getItem("restaurant-customer");
     if (savedDetails) {
       try {
         const { savedName, savedPhone, savedLocation, savedLandmark } = JSON.parse(savedDetails);
@@ -48,9 +49,9 @@ export default function CartPage() {
     if (!name || !phone || !location || cart.length === 0) return;
     setIsSubmitting(true);
     try {
-      localStorage.setItem("grocery-customer", JSON.stringify({ savedName: name, savedPhone: phone, savedLocation: location, savedLandmark: landmark }));
-      const pastItems = JSON.parse(localStorage.getItem("grocery-history") || "[]");
-      localStorage.setItem("grocery-history", JSON.stringify(Array.from(new Set([...pastItems, ...cart.map(i => i.id)]))));
+      localStorage.setItem("restaurant-customer", JSON.stringify({ savedName: name, savedPhone: phone, savedLocation: location, savedLandmark: landmark }));
+      const pastItems = JSON.parse(localStorage.getItem("restaurant-history") || "[]");
+      localStorage.setItem("restaurant-history", JSON.stringify(Array.from(new Set([...pastItems, ...cart.map(i => i.id)]))));
 
       // Prepare payload for backend
       const orderPayload = {
@@ -59,6 +60,7 @@ export default function CartPage() {
         location,
         landmark,
         total: totalPrice,
+        paymentMethod,
         cart: cart.map((item) => {
           const effectivePrice = item.portionPrice ?? item.price;
           const portionLabel = item.portion
@@ -89,8 +91,8 @@ export default function CartPage() {
         throw new Error(data.error || "Failed to place order.");
       }
 
-      const pastOrders = JSON.parse(localStorage.getItem("grocery-orders") || "[]");
-      localStorage.setItem("grocery-orders", JSON.stringify([...pastOrders, data.orderId]));
+      const pastOrders = JSON.parse(localStorage.getItem("restaurant-orders") || "[]");
+      localStorage.setItem("restaurant-orders", JSON.stringify([...pastOrders, data.orderId]));
 
       // Build items for WhatsApp using cartKey-aware structure
       const waItems = cart.map((item) => ({
@@ -102,10 +104,24 @@ export default function CartPage() {
           : (item.unit || ""),
       }));
 
-      clearCart();
-      router.push("/orders");
-      const url = generateWhatsAppMessage(waItems, totalPrice, name, phone, location, landmark);
-      window.open(url, "_blank");
+      if (paymentMethod === "gpay") {
+        const upiId = process.env.NEXT_PUBLIC_UPI_ID || "8089551181@ybl";
+        const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(process.env.NEXT_PUBLIC_SHOP_NAME || "Noor al Mandi")}&am=${totalPrice}&cu=INR&tn=${encodeURIComponent(`Order #${data.orderId.slice(-6)}`)}`;
+        window.location.href = upiUrl;
+        
+        // Also send WhatsApp after a brief delay so they have the confirmation text
+        setTimeout(() => {
+          const url = generateWhatsAppMessage(waItems, totalPrice, name, phone, location, landmark, "Paid via Google Pay");
+          window.open(url, "_blank");
+          clearCart();
+          router.push("/orders");
+        }, 3000);
+      } else {
+        clearCart();
+        router.push("/orders");
+        const url = generateWhatsAppMessage(waItems, totalPrice, name, phone, location, landmark);
+        window.open(url, "_blank");
+      }
     } catch (error) {
       console.error("Order failed:", error);
       alert(error.message || "Failed to place order. Please try again.");
@@ -290,18 +306,51 @@ export default function CartPage() {
               />
             </div>
 
+            <div className="pt-2">
+              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2.5">Payment Method</label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod("whatsapp")}
+                  className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all ${paymentMethod === "whatsapp" ? "border-green-600 bg-green-50 text-green-700" : "border-gray-100 bg-white text-gray-500"}`}
+                >
+                  <Send size={20} className="mb-1" />
+                  <span className="text-[13px] font-bold">WhatsApp Order</span>
+                  <span className="text-[10px] opacity-70">Pay on Delivery</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod("gpay")}
+                  className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all ${paymentMethod === "gpay" ? "border-blue-600 bg-blue-50 text-blue-700" : "border-gray-100 bg-white text-gray-500"}`}
+                >
+                  <div className="w-5 h-5 mb-1 flex items-center justify-center">
+                    <svg viewBox="0 0 40 40" className="w-full h-full">
+                      <path d="M33.07,17.42H20.31v5.44h7.36a6.3,6.3,0,0,1-2.72,4.14v3.45h4.39c2.57-2.37,4-5.85,4-9.89A12.42,12.42,0,0,1,33.07,17.42Z" fill="#4285f4" />
+                      <path d="M20.31,31.25a10.45,10.45,0,0,0,7.27-2.65l-4.39-3.45a6.57,6.57,0,0,1-9.76-3.46H9v3.52A12.5,12.5,0,0,0,20.31,31.25Z" fill="#34a853" />
+                      <path d="M13.43,21.69a7.61,7.61,0,0,1,0-4.88V13.29H9a12.5,12.5,0,0,0,0,11.92Z" fill="#fbbc04" />
+                      <path d="M20.31,10.43a6.83,6.83,0,0,1,4.83,1.89l3.63-3.61A12.35,12.35,0,0,0,20.31,5,12.5,12.5,0,0,0,9,13.29l4.43,3.52A6.57,6.57,0,0,1,20.31,10.43Z" fill="#ea4335" />
+                    </svg>
+                  </div>
+                  <span className="text-[13px] font-bold">Google Pay</span>
+                  <span className="text-[10px] opacity-70">Pay Instantly</span>
+                </button>
+              </div>
+            </div>
+
             <button
               type="submit"
               disabled={isSubmitting || !name || !phone || !location || totalPrice < MIN_ORDER}
-              className="w-full bg-gray-900 text-white rounded-2xl font-black text-[16px] flex items-center justify-center gap-2.5 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-gray-900/20 mt-4"
+              className={`w-full text-white rounded-2xl font-black text-[16px] flex items-center justify-center gap-2.5 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg mt-4 ${paymentMethod === 'gpay' ? 'bg-blue-600 shadow-blue-600/20' : 'bg-gray-900 shadow-gray-900/20'}`}
               style={{ paddingTop: "1.125rem", paddingBottom: "1.125rem" }}
             >
               {isSubmitting ? (
                 <><Loader2 size={20} className="animate-spin" /> Processing...</>
               ) : totalPrice < MIN_ORDER ? (
                 <><Lock size={18} /> Min. ₹{MIN_ORDER} Required</>
+              ) : paymentMethod === 'gpay' ? (
+                <>Pay ₹{totalPrice} with Google Pay</>
               ) : (
-                <><Send size={18} /> Order via WhatsApp</>
+                <><Send size={18} /> Order on WhatsApp</>
               )}
             </button>
             <p className="text-center text-xs text-gray-400 pb-4">

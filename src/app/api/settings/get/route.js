@@ -8,7 +8,7 @@ export async function GET() {
     if (!snap.exists()) {
       // Return defaults
       return NextResponse.json({
-        shopName: "ABC ",
+        shopName: "Noor al Mandi",
         whatsappNumber: "8891930562",
         address: "",
         openingTime: "10:00",

@@ -5,7 +5,7 @@ import { Loader2, Save, ToggleLeft, ToggleRight } from "lucide-react";
 import AdminNav from "@/components/AdminNav";
 
 const DEFAULTS = {
-  shopName: "ABC ",
+  shopName: "Noor al Mandi",
   whatsappNumber: "8891930562",
   address: "",
   openingTime: "10:00",

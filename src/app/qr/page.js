@@ -45,7 +45,7 @@ export default function QRPage() {
           </div>
 
           <h2 className="text-xl font-bold text-gray-800 tracking-tight">
-            {process.env.NEXT_PUBLIC_SHOP_NAME || "Chickcity Kitchen"}
+            {process.env.NEXT_PUBLIC_SHOP_NAME || "Noor al Mandi"}
           </h2>
           <p className="text-sm font-bold text-green-600 tracking-widest uppercase mt-1">
             Free Delivery*

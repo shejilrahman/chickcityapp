@@ -1,6 +1,6 @@
 export const generateWhatsAppMessage = (items, total, name, phone, location, landmark) => {
   const number = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "8891930562";
-  const shopName = process.env.NEXT_PUBLIC_SHOP_NAME || "ABC  Restaurant";
+  const shopName = process.env.NEXT_PUBLIC_SHOP_NAME || "Noor al Mandi";
 
   let message = `🍗 *New Order - ${shopName}*\n\n`;
 

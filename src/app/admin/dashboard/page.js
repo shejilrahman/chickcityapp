@@ -74,7 +74,7 @@ export default function AdminDashboard() {
 
   const showNotification = (msg) => {
     if ("Notification" in window && Notification.permission === "granted") {
-      new Notification("ABC ", { body: msg, icon: "/icons/icon-192.png" });
+      new Notification("Noor al Mandi", { body: msg, icon: "/icons/icon-192.png" });
     }
   };
 

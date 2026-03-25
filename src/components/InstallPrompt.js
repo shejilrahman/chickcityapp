@@ -38,7 +38,7 @@ export default function InstallPrompt() {
         </div>
 
         <div className="flex-1">
-          <h4 className="text-sm font-bold text-slate-900 leading-tight">Install ABC </h4>
+          <h4 className="text-sm font-bold text-slate-900 leading-tight">Install Noor al Mandi </h4>
           <p className="text-[11px] text-slate-500 mt-0.5">Add to home screen for a faster, app-like experience.</p>
         </div>
 

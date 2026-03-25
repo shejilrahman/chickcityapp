@@ -19,13 +19,13 @@ export const viewport = {
 };
 
 export const metadata = {
-  title: "ABC  Restaurant App",
+  title: "Noor al Mandi",
   description: "Order hot & fresh food via WhatsApp",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "ABC ",
+    title: "Noor al Mandi",
   },
   formatDetection: {
     telephone: false,

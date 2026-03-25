@@ -120,7 +120,7 @@ export default function AdminIndexPage() {
             </div>
             <div>
               <h1 className="font-black text-lg tracking-tight leading-none">Admin Panel</h1>
-              <p className="text-slate-500 text-[11px] mt-0.5">ABC  Restaurant</p>
+              <p className="text-slate-500 text-[11px] mt-0.5">Noor al Mandi</p>
             </div>
           </div>
           <button

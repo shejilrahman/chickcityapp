@@ -4,7 +4,7 @@ import { doc, runTransaction, collection, addDoc, serverTimestamp } from "fireba
 
 export async function POST(req) {
   try {
-    const { name, phone, location, landmark, cart, total } = await req.json();
+    const { name, phone, location, landmark, cart, total, paymentMethod } = await req.json();
 
     if (!name || !phone || !location || !cart || cart.length === 0) {
       return NextResponse.json({ error: "Missing required order fields" }, { status: 400 });
@@ -61,6 +61,7 @@ export async function POST(req) {
           quantity: Number(item.quantity) || 1
         })),
         total: Number(total) || 0,
+        paymentMethod: paymentMethod || "whatsapp",
         status: "pending",
         timestamp: serverTimestamp(),
       });

@@ -20,7 +20,6 @@ export default function Home() {
   const [productsLoaded, setProductsLoaded] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All Menu");
-  const [pastItems, setPastItems] = useState([]);
   const [isHydrated, setIsHydrated] = useState(false);
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
@@ -45,14 +44,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    try {
-      const history = JSON.parse(localStorage.getItem("restaurant-history") || "[]");
-      setPastItems(history);
-    } catch (e) {
-      console.error("Failed to load history", e);
-    } finally {
-      setIsHydrated(true);
-    }
+    setIsHydrated(true);
   }, []);
 
   const categories = useMemo(() => {
@@ -131,7 +123,6 @@ export default function Home() {
 
   const visibleProducts = filteredProducts.slice(0, visibleCount);
   const hasMore         = visibleCount < filteredProducts.length;
-  const pastProducts    = allProducts.filter(p => pastItems.includes(p.id)).slice(0, 8);
   const isSearching     = !!searchTerm.trim();
 
   /* ─── Loading state — wait for hydration and data ─── */
@@ -273,24 +264,6 @@ export default function Home() {
               {filteredProducts.length} items
             </span>
           </div>
-
-          {/* ── Buy Again strip ── */}
-          {pastProducts.length > 0 && selectedCategory === "All" && !isSearching && (
-            <div className="px-3 mb-3">
-              <p className="text-[11px] font-bold text-green-600 uppercase tracking-widest mb-2 flex items-center gap-1">
-                🔁 <span>Buy Again</span>
-              </p>
-              <div className="flex overflow-x-auto hide-scrollbar gap-2 pb-1 snap-x">
-                {pastProducts.map(product => (
-                  <div key={product.id} className="min-w-[106px] max-w-[106px] snap-start">
-                    <ProductCard product={product} />
-                  </div>
-                ))}
-              </div>
-              {/* subtle separator */}
-              <div className="h-px bg-green-100 mt-3" />
-            </div>
-          )}
 
           {/* ── Products ── */}
           {filteredProducts.length > 0 ? (

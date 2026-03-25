@@ -8,12 +8,14 @@ import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Trash2, Plus, Minus, Send, MapPin, Loader2, ShoppingBag, Lock, AlertTriangle } from "lucide-react";
 import Image from "next/image";
-import { WEIGHT_SLABS, getSlabPrice, formatGrams } from "@/lib/weight-slabs";
 import dynamic from "next/dynamic";
 
 const MapPicker = dynamic(() => import("@/components/MapPicker"), { ssr: false });
 
 const MIN_ORDER = 300;
+
+const PORTION_LABELS = { qtr: "Qtr", half: "Half", full: "Full" };
+const RICE_LABELS = { withRice: "With Rice", meatOnly: "Meat Only" };
 
 export default function CartPage() {
   const { cart, updateQuantity, totalItems, totalPrice, clearCart, getEffectivePrice } = useCart();
@@ -58,20 +60,18 @@ export default function CartPage() {
         customerLocation: location || "",
         customerLandmark: landmark || "",
         items: cart.map((item) => {
-          const slab = item.weightSlab ? WEIGHT_SLABS[item.weightSlab] : null;
-          const effectivePrice = slab && item.selectedGrams
-            ? getSlabPrice(item.price, item.selectedGrams, slab.baseUnit)
-            : item.price;
-          
+          const effectivePrice = item.portionPrice ?? item.price;
+          const portionLabel = item.portion
+            ? `${PORTION_LABELS[item.portion] ?? item.portion} · ${RICE_LABELS[item.riceType] ?? item.riceType}`
+            : (item.unit || "Portion");
+
           return {
             id: item.id || "",
             name: item.name || "Unknown Item",
             price: Number(effectivePrice) || 0,
-            quantity: item.weightSlab ? 1 : (Number(item.quantity) || 1),
-            unit: (item.weightSlab && item.selectedGrams) 
-              ? formatGrams(item.selectedGrams) 
-              : (item.unit || "Portion"),
-            ...(item.weightSlab ? { weightSlab: item.weightSlab, selectedGrams: item.selectedGrams } : {}),
+            quantity: Number(item.quantity) || 1,
+            unit: portionLabel,
+            ...(item.portion ? { portion: item.portion, riceType: item.riceType } : {}),
           };
         }),
         total: Number(totalPrice) || 0,
@@ -81,9 +81,20 @@ export default function CartPage() {
 
       const pastOrders = JSON.parse(localStorage.getItem("grocery-orders") || "[]");
       localStorage.setItem("grocery-orders", JSON.stringify([...pastOrders, docRef.id]));
+
+      // Build items for WhatsApp using cartKey-aware structure
+      const waItems = cart.map((item) => ({
+        name: item.name,
+        price: item.portionPrice ?? item.price,
+        quantity: item.quantity,
+        unit: item.portion
+          ? `${PORTION_LABELS[item.portion] ?? item.portion} · ${RICE_LABELS[item.riceType] ?? item.riceType}`
+          : (item.unit || ""),
+      }));
+
       clearCart();
       router.push("/orders");
-      const url = generateWhatsAppMessage(cart, totalPrice, name, phone, location, landmark);
+      const url = generateWhatsAppMessage(waItems, totalPrice, name, phone, location, landmark);
       window.open(url, "_blank");
     } catch (error) {
       console.error("Order failed:", error);
@@ -135,62 +146,57 @@ export default function CartPage() {
         {/* Cart Items */}
         <div className="space-y-2.5">
           {cart.map((item) => {
-            const slab = item.weightSlab ? WEIGHT_SLABS[item.weightSlab] : null;
-            const effectivePrice = slab && item.selectedGrams
-              ? getSlabPrice(item.price, item.selectedGrams, slab.baseUnit)
-              : item.price;
-            const lineTotal = effectivePrice * (slab ? 1 : item.quantity);
-            const unitLabel = slab ? formatGrams(item.selectedGrams) : `₹${item.price} ${item.unit ? "/ " + item.unit : ""}`;
+            const effectivePrice = item.portionPrice ?? item.price;
+            const lineTotal = effectivePrice * item.quantity;
+            const portionLabel = item.portion
+              ? `${PORTION_LABELS[item.portion] ?? item.portion} · ${RICE_LABELS[item.riceType] ?? item.riceType}`
+              : (item.unit ? `₹${item.price} / ${item.unit}` : "");
 
             return (
-            <div key={item.id} className="bg-white rounded-2xl p-3.5 flex items-center gap-3 shadow-sm border border-gray-100">
-              {/* Thumbnail */}
-              <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-gray-50 relative border border-gray-100">
-                {item.image ? (
-                  <Image src={item.image} alt={item.name} fill className="object-cover" sizes="64px" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <span className="text-3xl">{item.emoji || "📦"}</span>
-                  </div>
-                )}
-              </div>
+              <div key={item.cartKey} className="bg-white rounded-2xl p-3.5 flex items-center gap-3 shadow-sm border border-gray-100">
+                {/* Thumbnail */}
+                <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-gray-50 relative border border-gray-100">
+                  {item.image ? (
+                    <Image src={item.image} alt={item.name} fill className="object-cover" sizes="64px" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <span className="text-3xl">{item.emoji || "🍽️"}</span>
+                    </div>
+                  )}
+                </div>
 
-              {/* Info */}
-              <div className="flex-1 min-w-0">
-                <h3 className="font-bold text-[14px] text-gray-900 truncate">{item.name}</h3>
-                <p className="text-xs text-gray-400">{unitLabel}</p>
-                <div className="flex items-center gap-2 mt-2">
-                  <div className="flex items-center bg-gray-100 rounded-xl overflow-hidden">
-                    <button
-                      onClick={() => updateQuantity(item.id, -1)}
-                      className="w-8 h-8 flex items-center justify-center text-gray-600 active:bg-gray-200 transition-colors"
-                    >
-                      {slab
-                        ? <Minus size={14} />
-                        : (item.quantity === 1 ? <Trash2 size={14} className="text-red-500" /> : <Minus size={14} />)
-                      }
-                    </button>
-                    <span className="w-auto px-2 text-center font-bold text-sm select-none text-gray-900">
-                      {slab ? formatGrams(item.selectedGrams) : item.quantity}
-                    </span>
-                    <button
-                      onClick={() => updateQuantity(item.id, 1)}
-                      disabled={slab && item.selectedGrams >= slab.max}
-                      className="w-8 h-8 flex items-center justify-center text-gray-600 active:bg-gray-200 transition-colors disabled:opacity-40"
-                    >
-                      <Plus size={14} />
-                    </button>
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-bold text-[14px] text-gray-900 truncate">{item.name}</h3>
+                  {portionLabel && <p className="text-xs text-gray-400">{portionLabel}</p>}
+                  <div className="flex items-center gap-2 mt-2">
+                    <div className="flex items-center bg-gray-100 rounded-xl overflow-hidden">
+                      <button
+                        onClick={() => updateQuantity(item.cartKey, -1)}
+                        className="w-8 h-8 flex items-center justify-center text-gray-600 active:bg-gray-200 transition-colors"
+                      >
+                        {item.quantity === 1 ? <Trash2 size={14} className="text-red-500" /> : <Minus size={14} />}
+                      </button>
+                      <span className="w-auto px-2 text-center font-bold text-sm select-none text-gray-900">
+                        {item.quantity}
+                      </span>
+                      <button
+                        onClick={() => updateQuantity(item.cartKey, 1)}
+                        className="w-8 h-8 flex items-center justify-center text-gray-600 active:bg-gray-200 transition-colors"
+                      >
+                        <Plus size={14} />
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Line Total */}
-              <div className="text-right flex-shrink-0">
-                <p className="font-black text-[17px] text-gray-900">₹{lineTotal.toFixed(2)}</p>
-                {slab && <p className="text-[10px] text-gray-400">@ ₹{item.price} (Full)</p>}
+                {/* Line Total */}
+                <div className="text-right flex-shrink-0">
+                  <p className="font-black text-[17px] text-gray-900">₹{lineTotal.toFixed(2)}</p>
+                  <p className="text-[10px] text-gray-400">@ ₹{effectivePrice}</p>
+                </div>
               </div>
-            </div>
-          );
+            );
           })}
         </div>
 
@@ -277,7 +283,7 @@ export default function CartPage() {
             <button
               type="submit"
               disabled={isSubmitting || !name || !phone || !location || totalPrice < MIN_ORDER}
-              className="w-full bg-gray-900 text-white rounded-2xl py-4.5 font-black text-[16px] flex items-center justify-center gap-2.5 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-gray-900/20 mt-4"
+              className="w-full bg-gray-900 text-white rounded-2xl font-black text-[16px] flex items-center justify-center gap-2.5 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-gray-900/20 mt-4"
               style={{ paddingTop: "1.125rem", paddingBottom: "1.125rem" }}
             >
               {isSubmitting ? (

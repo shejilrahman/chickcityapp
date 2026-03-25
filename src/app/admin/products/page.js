@@ -3,17 +3,19 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import {
   Search, Plus, Edit3, Trash2, Loader2, Save, X, Filter,
-  Eye, EyeOff, ChevronDown, ChevronUp, Leaf, Flame,
+  Eye, EyeOff, Leaf, Flame,
 } from "lucide-react";
 import AdminNav from "@/components/AdminNav";
-import { WEIGHT_SLABS } from "@/lib/weight-slabs";
 
-const SPICE_LEVELS = ["Mild", "Medium", "Hot", "Extra Hot"];
+const SPICE_LEVELS = ["None", "Mild", "Medium", "Hot", "Extra Hot"];
+
+const EMPTY_SLAB = { withRice: { qtr: "", half: "", full: "" }, meatOnly: { qtr: "", half: "", full: "" } };
+
 const FORM_DEFAULT = {
   name: "", description: "", category: "", categoryId: "",
   price: "", mrp: "", image: "", isVeg: false, isBestseller: false,
-  spiceLevel: "Medium", portionSlab: "", tags: "", sortOrder: "",
-  isAvailable: true,
+  spiceLevel: "Medium", hasPortions: false, portionSlab: EMPTY_SLAB,
+  priceNote: "", tags: "", sortOrder: "", isAvailable: true,
 };
 
 export default function ProductsAdminPage() {
@@ -31,11 +33,7 @@ export default function ProductsAdminPage() {
 
   const RESULTS_CAP = 80;
 
-  useEffect(() => {
-    load();
-  }, [load]);
-
-  async function load() {
+  const load = useCallback(async () => {
     setIsLoaded(false);
     try {
       const [prodRes, catRes] = await Promise.all([
@@ -50,7 +48,9 @@ export default function ProductsAdminPage() {
     } finally {
       setIsLoaded(true);
     }
-  }
+  }, []);
+
+  useEffect(() => { load(); }, [load]);
 
   const filteredProducts = useMemo(() => {
     const term = search.toLowerCase();
@@ -74,15 +74,34 @@ export default function ProductsAdminPage() {
     setShowForm(true);
   };
 
+  const parsePortionSlab = (slab) => {
+    if (!slab || typeof slab !== "object") return EMPTY_SLAB;
+    return {
+      withRice: {
+        qtr: slab.withRice?.qtr ?? "",
+        half: slab.withRice?.half ?? "",
+        full: slab.withRice?.full ?? "",
+      },
+      meatOnly: {
+        qtr: slab.meatOnly?.qtr ?? "",
+        half: slab.meatOnly?.half ?? "",
+        full: slab.meatOnly?.full ?? "",
+      },
+    };
+  };
+
   const openEdit = (p) => {
     setEditingId(p.id);
+    const hasPortions = !!p.portionSlab;
     setForm({
       name: p.name || "", description: p.description || "",
       category: p.category || "", categoryId: p.categoryId || "",
       price: p.price || "", mrp: p.mrp || "", image: p.image || "",
       isVeg: Boolean(p.isVeg), isBestseller: Boolean(p.isBestseller),
       spiceLevel: p.spiceLevel || "Medium",
-      portionSlab: p.portionSlab || p.weightSlab || "",
+      hasPortions,
+      portionSlab: hasPortions ? parsePortionSlab(p.portionSlab) : EMPTY_SLAB,
+      priceNote: p.priceNote || "",
       tags: (p.tags || []).join(", "),
       sortOrder: p.sortOrder || "",
       isAvailable: p.isAvailable !== false && !p.hidden,
@@ -90,17 +109,50 @@ export default function ProductsAdminPage() {
     setShowForm(true);
   };
 
+  const buildPortionSlab = () => {
+    if (!form.hasPortions) return null;
+    const s = form.portionSlab;
+    return {
+      withRice: {
+        qtr: Number(s.withRice.qtr) || 0,
+        half: Number(s.withRice.half) || 0,
+        full: Number(s.withRice.full) || 0,
+      },
+      meatOnly: {
+        qtr: Number(s.meatOnly.qtr) || 0,
+        half: Number(s.meatOnly.half) || 0,
+        full: Number(s.meatOnly.full) || 0,
+      },
+    };
+  };
+
   const handleSave = async () => {
-    if (!form.name || !form.price) return showToast("⚠️ Name and price are required.");
+    if (!form.name) return showToast("⚠️ Name is required.");
+    if (!form.hasPortions && !form.price && !form.priceNote) return showToast("⚠️ Price is required for flat-price items.");
     setIsSubmitting(true);
     try {
+      const portionSlab = buildPortionSlab();
+      // Starting price = withRice.qtr for portion items, or form.price for flat
+      const startingPrice = portionSlab
+        ? (portionSlab.withRice?.qtr || 0)
+        : Number(form.price) || 0;
+
       const payload = {
-        ...form,
-        price: Number(form.price),
-        mrp: form.mrp ? Number(form.mrp) : Number(form.price),
+        name: form.name,
+        description: form.description,
+        category: form.category,
+        categoryId: form.categoryId,
+        price: startingPrice,
+        mrp: form.mrp ? Number(form.mrp) : null,
+        image: form.image,
+        isVeg: form.isVeg,
+        isBestseller: form.isBestseller,
+        spiceLevel: form.spiceLevel,
+        portionSlab,
+        priceNote: form.priceNote || null,
         tags: form.tags ? form.tags.split(",").map((t) => t.trim()).filter(Boolean) : [],
         sortOrder: form.sortOrder ? Number(form.sortOrder) : 0,
-        portionSlab: form.portionSlab || null,
+        isAvailable: form.isAvailable,
       };
 
       const url = editingId ? "/api/products/update" : "/api/products/create";
@@ -113,7 +165,6 @@ export default function ProductsAdminPage() {
       });
 
       if (!res.ok) throw new Error((await res.json()).error || "Failed");
-
       showToast(editingId ? "✅ Product updated!" : "✅ Product created!");
       setShowForm(false);
       await load();
@@ -155,6 +206,16 @@ export default function ProductsAdminPage() {
     } catch {
       showToast("❌ Failed to toggle availability.");
     }
+  };
+
+  const setSlabField = (riceType, size, val) => {
+    setForm(f => ({
+      ...f,
+      portionSlab: {
+        ...f.portionSlab,
+        [riceType]: { ...f.portionSlab[riceType], [size]: val },
+      },
+    }));
   };
 
   const catOptions = ["All", ...categories.map((c) => c.title || c).filter(Boolean)];
@@ -222,16 +283,15 @@ export default function ProductsAdminPage() {
             <div className="divide-y divide-slate-800">
               {filteredProducts.map((p) => {
                 const isAvail = p.isAvailable !== false && !p.hidden;
+                const hasP = !!p.portionSlab;
                 return (
                   <div key={p.id} className="flex items-center gap-4 p-4 hover:bg-slate-800/40 group">
-                    {/* Image */}
                     <div className="w-12 h-12 rounded-xl bg-slate-950 overflow-hidden border border-slate-800 flex-shrink-0 relative">
                       {p.image
                         ? <img src={p.image} className="w-full h-full object-cover" alt="" />
                         : <span className="w-full h-full flex items-center justify-center text-xl">🍽️</span>
                       }
                     </div>
-                    {/* Info */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="font-bold text-slate-200 truncate">{p.name}</span>
@@ -239,12 +299,14 @@ export default function ProductsAdminPage() {
                         {p.isBestseller && <span className="text-[10px] bg-yellow-500/20 text-yellow-400 px-1.5 py-0.5 rounded-full font-bold flex-shrink-0">⭐ Best</span>}
                       </div>
                       <p className="text-xs text-slate-500 mt-0.5">
-                        {p.category} • ₹{p.price}
-                        {p.mrp && p.mrp > p.price && <span className="line-through ml-1 opacity-50">₹{p.mrp}</span>}
-                        {p.spiceLevel && <span className="ml-2">{p.spiceLevel === "Hot" || p.spiceLevel === "Extra Hot" ? "🌶️" : ""}</span>}
+                        {p.category} •{" "}
+                        {hasP
+                          ? `₹${p.portionSlab?.withRice?.qtr ?? p.price} (Qtr) — ₹${p.portionSlab?.withRice?.full ?? ""} (Full)`
+                          : `₹${p.price}`}
+                        {p.priceNote && <span className="ml-1 text-amber-500">{p.priceNote}</span>}
+                        {p.spiceLevel && p.spiceLevel !== "None" && <span className="ml-2">{p.spiceLevel === "Hot" || p.spiceLevel === "Extra Hot" ? "🌶️" : ""}</span>}
                       </p>
                     </div>
-                    {/* Actions */}
                     <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={() => toggleAvailable(p)}
@@ -279,7 +341,7 @@ export default function ProductsAdminPage() {
             </div>
           </div>
 
-          {/* Slide-in Add / Edit Form */}
+          {/* Add / Edit Form */}
           {showForm && (
             <div className="w-96 bg-slate-900 border border-slate-800 rounded-3xl flex flex-col overflow-hidden">
               <div className="flex items-center justify-between p-5 border-b border-slate-800">
@@ -291,7 +353,7 @@ export default function ProductsAdminPage() {
                 {/* Name */}
                 <Field label="Name *">
                   <input type="text" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                    className="form-input" placeholder="e.g. Chicken Mandi" />
+                    className="form-input" placeholder="e.g. Classic Mandhi" />
                 </Field>
 
                 {/* Description */}
@@ -314,31 +376,64 @@ export default function ProductsAdminPage() {
                   </select>
                 </Field>
 
-                {/* Price & MRP */}
-                <div className="grid grid-cols-2 gap-3">
-                  <Field label="Price (₹) *">
-                    <input type="number" value={form.price} onChange={e => setForm(f => ({ ...f, price: e.target.value }))}
-                      className="form-input" placeholder="0" />
-                  </Field>
-                  <Field label="MRP (₹)">
-                    <input type="number" value={form.mrp} onChange={e => setForm(f => ({ ...f, mrp: e.target.value }))}
-                      className="form-input" placeholder="0" />
-                  </Field>
+                {/* Has Portions toggle */}
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => setForm(f => ({ ...f, hasPortions: !f.hasPortions }))}
+                    className={`w-full py-2.5 rounded-xl font-bold text-sm transition-colors ${form.hasPortions ? "bg-purple-600 text-white" : "bg-slate-800 text-slate-400"}`}
+                  >
+                    {form.hasPortions ? "✅ Has Portions (Qtr / Half / Full)" : "❌ Flat Price (no portions)"}
+                  </button>
                 </div>
 
-                {/* Portion Slab */}
-                <Field label="Portion Slab">
-                  <select value={form.portionSlab} onChange={e => setForm(f => ({ ...f, portionSlab: e.target.value }))} className="form-input">
-                    <option value="">None (fixed price)</option>
-                    {Object.values(WEIGHT_SLABS).map(s => (
-                      <option key={s.key} value={s.key}>{s.label} ({s.shortLabel})</option>
+                {/* ── Portion Slab Grid ── */}
+                {form.hasPortions ? (
+                  <div className="bg-slate-800 rounded-2xl p-4 space-y-3">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Portion Prices (₹)</p>
+                    {["withRice", "meatOnly"].map(rt => (
+                      <div key={rt}>
+                        <p className="text-[10px] text-slate-500 font-semibold mb-1.5">{rt === "withRice" ? "With Rice" : "Meat Only"}</p>
+                        <div className="grid grid-cols-3 gap-2">
+                          {[["qtr", "Qtr"], ["half", "Half"], ["full", "Full"]].map(([sz, lbl]) => (
+                            <div key={sz}>
+                              <label className="text-[9px] text-slate-500 uppercase tracking-widest block mb-1">{lbl}</label>
+                              <input
+                                type="number"
+                                value={form.portionSlab[rt][sz]}
+                                onChange={e => setSlabField(rt, sz, e.target.value)}
+                                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-2 py-1.5 text-sm focus:ring-2 focus:ring-purple-500 outline-none"
+                                placeholder="0"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                     ))}
-                  </select>
-                </Field>
+                  </div>
+                ) : (
+                  /* Flat price fields */
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-2 gap-3">
+                      <Field label="Price (₹) *">
+                        <input type="number" value={form.price} onChange={e => setForm(f => ({ ...f, price: e.target.value }))}
+                          className="form-input" placeholder="0" />
+                      </Field>
+                      <Field label="MRP (₹)">
+                        <input type="number" value={form.mrp} onChange={e => setForm(f => ({ ...f, mrp: e.target.value }))}
+                          className="form-input" placeholder="0" />
+                      </Field>
+                    </div>
+                    <Field label="Price Note (optional)">
+                      <input type="text" value={form.priceNote} onChange={e => setForm(f => ({ ...f, priceNote: e.target.value }))}
+                        className="form-input" placeholder="e.g. As per size / Item" />
+                    </Field>
+                  </div>
+                )}
 
                 {/* Spice Level */}
                 <Field label="Spice Level">
-                  <div className="flex gap-2">
+                  <div className="flex gap-1 flex-wrap">
                     {SPICE_LEVELS.map(lvl => (
                       <button key={lvl} type="button"
                         onClick={() => setForm(f => ({ ...f, spiceLevel: lvl }))}
@@ -352,30 +447,15 @@ export default function ProductsAdminPage() {
 
                 {/* Toggles */}
                 <div className="flex gap-3">
-                  <Toggle
-                    label="🥦 Veg"
-                    active={form.isVeg}
-                    color="green"
-                    onClick={() => setForm(f => ({ ...f, isVeg: !f.isVeg }))}
-                  />
-                  <Toggle
-                    label="⭐ Bestseller"
-                    active={form.isBestseller}
-                    color="yellow"
-                    onClick={() => setForm(f => ({ ...f, isBestseller: !f.isBestseller }))}
-                  />
-                  <Toggle
-                    label="👁 Available"
-                    active={form.isAvailable}
-                    color="blue"
-                    onClick={() => setForm(f => ({ ...f, isAvailable: !f.isAvailable }))}
-                  />
+                  <Toggle label="🥦 Veg" active={form.isVeg} color="green" onClick={() => setForm(f => ({ ...f, isVeg: !f.isVeg }))} />
+                  <Toggle label="⭐ Best" active={form.isBestseller} color="yellow" onClick={() => setForm(f => ({ ...f, isBestseller: !f.isBestseller }))} />
+                  <Toggle label="👁 Available" active={form.isAvailable} color="blue" onClick={() => setForm(f => ({ ...f, isAvailable: !f.isAvailable }))} />
                 </div>
 
                 {/* Tags */}
                 <Field label="Tags (comma-separated)">
                   <input type="text" value={form.tags} onChange={e => setForm(f => ({ ...f, tags: e.target.value }))}
-                    className="form-input" placeholder="Grilled, Mandi, Sharing" />
+                    className="form-input" placeholder="mandi, chicken, arabic" />
                 </Field>
 
                 {/* Sort Order */}

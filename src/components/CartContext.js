@@ -1,7 +1,6 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect } from "react";
-import { WEIGHT_SLABS, getSlabPrice } from "@/lib/weight-slabs";
 
 const CartContext = createContext();
 
@@ -30,91 +29,100 @@ export function CartProvider({ children }) {
   }, [cart, isMounted]);
 
   /**
-   * Compute the effective price for a cart item.
-   * For slab products: price = (selectedGrams / baseUnit) × product.price
-   * For regular products: price = product.price
+   * Add a product to cart.
+   * For portionSlab products: supply portion ("qtr"|"half"|"full") and
+   * riceType ("withRice"|"meatOnly") and portionPrice (explicit price).
+   * For flat-price products: these are left undefined.
+   *
+   * Each cart key = `${product.id}__${portion}__${riceType}` for
+   * portionSlab items, or just `product.id` for flat items.
    */
-  const getEffectivePrice = (item) => {
-    if (item.weightSlab && item.selectedGrams) {
-      const slab = WEIGHT_SLABS[item.weightSlab];
-      if (slab) {
-        return getSlabPrice(item.price, item.selectedGrams, slab.baseUnit);
-      }
-    }
-    return item.price;
-  };
-
-  const addToCart = (product) => {
+  const addToCart = (product, portion, riceType, portionPrice) => {
     setCart((prev) => {
-      const existing = prev.find((item) => item.id === product.id);
+      const hasPortions = !!product.portionSlab;
 
-      if (product.weightSlab) {
-        // Slab product — quantity is always 1, and selectedGrams tracks amount
-        const slab = WEIGHT_SLABS[product.weightSlab];
-        if (!slab) return prev;
+      if (hasPortions) {
+        const _portion = portion || "qtr";
+        const _riceType = riceType || "withRice";
+        const _price =
+          portionPrice ??
+          product.portionSlab?.[_riceType]?.[_portion] ??
+          product.price;
+        const cartKey = `${product.id}__${_portion}__${_riceType}`;
 
+        const existing = prev.find((item) => item.cartKey === cartKey);
         if (existing) {
-          // Already in cart — bump by one step
-          const newGrams = Math.min(existing.selectedGrams + slab.step, slab.max);
           return prev.map((item) =>
-            item.id === product.id ? { ...item, selectedGrams: newGrams } : item
+            item.cartKey === cartKey
+              ? { ...item, quantity: item.quantity + 1 }
+              : item
           );
         }
-        // New item — start at minimum
         return [
           ...prev,
-          { ...product, quantity: 1, selectedGrams: slab.min },
+          {
+            ...product,
+            cartKey,
+            portion: _portion,
+            riceType: _riceType,
+            portionPrice: _price,
+            quantity: 1,
+          },
         ];
       }
 
-      // Regular product — regular quantity
+      // Flat-price product
+      const existing = prev.find(
+        (item) => item.cartKey === product.id || item.id === product.id && !item.portion
+      );
       if (existing) {
         return prev.map((item) =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+          (item.cartKey === product.id || (item.id === product.id && !item.portion))
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
         );
       }
-      return [...prev, { ...product, quantity: 1 }];
+      return [
+        ...prev,
+        { ...product, cartKey: product.id, quantity: 1 },
+      ];
     });
   };
 
-  const updateQuantity = (id, delta) => {
+  const updateQuantity = (cartKey, delta) => {
     setCart((prev) =>
       prev
-        .map((item) => {
-          if (item.id !== id) return item;
-
-          if (item.weightSlab) {
-            const slab = WEIGHT_SLABS[item.weightSlab];
-            if (!slab) return item;
-            const newGrams = item.selectedGrams + delta * slab.step;
-            return { ...item, selectedGrams: newGrams };
-          }
-
-          return { ...item, quantity: item.quantity + delta };
-        })
-        .filter((item) => {
-          if (item.weightSlab) {
-            const slab = WEIGHT_SLABS[item.weightSlab];
-            return slab && item.selectedGrams >= slab.min;
-          }
-          return item.quantity > 0;
-        })
+        .map((item) =>
+          item.cartKey === cartKey
+            ? { ...item, quantity: item.quantity + delta }
+            : item
+        )
+        .filter((item) => item.quantity > 0)
     );
   };
 
   const clearCart = () => setCart([]);
 
-  const totalItems = cart.reduce((acc, item) => acc + (item.weightSlab ? 1 : item.quantity), 0);
+  const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
 
   const totalPrice = cart.reduce((acc, item) => {
-    const effectivePrice = getEffectivePrice(item);
-    const qty = item.weightSlab ? 1 : item.quantity;
-    return acc + effectivePrice * qty;
+    const price = item.portionPrice ?? item.price ?? 0;
+    return acc + price * item.quantity;
   }, 0);
+
+  const getEffectivePrice = (item) => item.portionPrice ?? item.price ?? 0;
 
   return (
     <CartContext.Provider
-      value={{ cart, addToCart, updateQuantity, clearCart, totalItems, totalPrice, getEffectivePrice }}
+      value={{
+        cart,
+        addToCart,
+        updateQuantity,
+        clearCart,
+        totalItems,
+        totalPrice,
+        getEffectivePrice,
+      }}
     >
       {children}
     </CartContext.Provider>

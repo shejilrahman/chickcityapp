@@ -1,59 +1,71 @@
 /**
- * Portion Slab Definitions (formerly Weight Slabs)
+ * Portion Slab Helpers
  *
- * Each slab defines how a product is sold in portions (Qtr, Half, Full).
- * For a restaurant, portions are based on a base price (e.g., Full price).
- * 
- * baseUnit: conceptually 1.0 (Full)
+ * New structure: portionSlab = {
+ *   withRice:  { qtr, half, full },
+ *   meatOnly:  { qtr, half, full }
+ * }
+ * or null for flat-price items.
  */
 
+export const PORTION_SIZES = ["qtr", "half", "full"];
+export const RICE_TYPES = ["withRice", "meatOnly"];
+
+export const PORTION_LABELS = {
+  qtr: "Quarter",
+  half: "Half",
+  full: "Full",
+};
+
+export const RICE_TYPE_LABELS = {
+  withRice: "With Rice",
+  meatOnly: "Meat Only",
+};
+
+/**
+ * Get the explicit price from a portionSlab.
+ * @param {object} portionSlab
+ * @param {"withRice"|"meatOnly"} riceType
+ * @param {"qtr"|"half"|"full"} size
+ * @returns {number|null}
+ */
+export function getPortionPrice(portionSlab, riceType, size) {
+  if (!portionSlab) return null;
+  return portionSlab[riceType]?.[size] ?? null;
+}
+
+/**
+ * Get the starting/display price for a portionSlab product (withRice qtr).
+ */
+export function getStartingPrice(product) {
+  if (product.portionSlab?.withRice?.qtr != null) {
+    return product.portionSlab.withRice.qtr;
+  }
+  return product.price;
+}
+
+// ── Legacy exports kept for any remaining usage ──────────────────────────────
 export const WEIGHT_SLABS = {
   slab_portions: {
     key: "slab_portions",
     label: "Standard Portions",
     shortLabel: "Q/H/F",
-    step: 0.25,      // portion step
-    min: 0.25,       // Qtr
-    max: 1.0,        // Full
-    baseUnit: 1.0,   // price is per 1.0 (Full)
+    step: 0.25,
+    min: 0.25,
+    max: 1.0,
+    baseUnit: 1.0,
     color: "purple",
     example: "Chicken, Mandi, Biryani",
   },
-  slab_family: {
-    key: "slab_family",
-    label: "Family Portions",
-    shortLabel: "F/XL",
-    step: 0.5,
-    min: 1.0,
-    max: 2.0,
-    baseUnit: 1.0,
-    color: "orange",
-    example: "Family Buckets, Platters",
-  },
 };
 
-export const SLAB_LIST = Object.values(WEIGHT_SLABS);
-
-/**
- * Get the effective price for a slab product.
- * @param {number} basePrice - product.price (price per baseUnit)
- * @param {number} selectedValue - portion value (0.25, 0.5, 1.0, etc.)
- * @param {number} baseUnit - default 1.0
- * @returns {number} price rounded to 2 decimal places
- */
 export function getSlabPrice(basePrice, selectedValue, baseUnit = 1.0) {
   return Math.round((basePrice / baseUnit) * selectedValue * 100) / 100;
 }
 
-/**
- * Format portions nicely: 0.25 → "Qtr", 0.5 → "Half", 1.0 → "Full"
- */
 export function formatGrams(value) {
   if (value === 0.25) return "Qtr";
   if (value === 0.5) return "Half";
   if (value === 1.0) return "Full";
-  if (value === 1.5) return "1.5 Full";
-  if (value === 2.0) return "Double / XL";
   return `${value} Portion`;
 }
-

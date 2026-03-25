@@ -3,8 +3,6 @@
 import { useState, useEffect } from "react";
 import { useCart } from "@/components/CartContext";
 import { generateWhatsAppMessage } from "@/lib/whatsapp";
-import { db } from "@/lib/firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Trash2, Plus, Minus, Send, MapPin, Loader2, ShoppingBag, Lock, AlertTriangle } from "lucide-react";
 import Image from "next/image";
@@ -54,12 +52,14 @@ export default function CartPage() {
       const pastItems = JSON.parse(localStorage.getItem("grocery-history") || "[]");
       localStorage.setItem("grocery-history", JSON.stringify(Array.from(new Set([...pastItems, ...cart.map(i => i.id)]))));
 
-      const docRef = await addDoc(collection(db, "orders"), {
-        customerName: name || "",
-        customerPhone: phone || "",
-        customerLocation: location || "",
-        customerLandmark: landmark || "",
-        items: cart.map((item) => {
+      // Prepare payload for backend
+      const orderPayload = {
+        name,
+        phone,
+        location,
+        landmark,
+        total: totalPrice,
+        cart: cart.map((item) => {
           const effectivePrice = item.portionPrice ?? item.price;
           const portionLabel = item.portion
             ? `${PORTION_LABELS[item.portion] ?? item.portion} · ${RICE_LABELS[item.riceType] ?? item.riceType}`
@@ -73,14 +73,24 @@ export default function CartPage() {
             unit: portionLabel,
             ...(item.portion ? { portion: item.portion, riceType: item.riceType } : {}),
           };
-        }),
-        total: Number(totalPrice) || 0,
-        status: "pending",
-        timestamp: serverTimestamp(),
+        })
+      };
+
+      // Call secure transaction API
+      const res = await fetch("/api/orders/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(orderPayload)
       });
+      
+      const data = await res.json();
+      
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to place order.");
+      }
 
       const pastOrders = JSON.parse(localStorage.getItem("grocery-orders") || "[]");
-      localStorage.setItem("grocery-orders", JSON.stringify([...pastOrders, docRef.id]));
+      localStorage.setItem("grocery-orders", JSON.stringify([...pastOrders, data.orderId]));
 
       // Build items for WhatsApp using cartKey-aware structure
       const waItems = cart.map((item) => ({
@@ -98,7 +108,7 @@ export default function CartPage() {
       window.open(url, "_blank");
     } catch (error) {
       console.error("Order failed:", error);
-      alert("Failed to place order. Please try again.");
+      alert(error.message || "Failed to place order. Please try again.");
     } finally {
       setIsSubmitting(false);
     }

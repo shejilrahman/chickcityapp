@@ -52,8 +52,11 @@ export default function ProductListItem({ product }) {
     (rt) => product.portionSlab?.[rt.key]
   );
 
+  const stockCount = product.stockCount !== undefined ? product.stockCount : 999;
+  const isOutOfStock = stockCount <= 0;
+
   return (
-    <div className="bg-white flex flex-col px-4 py-3 border-b border-gray-100 active:bg-gray-50 transition-colors relative">
+    <div className={`bg-white flex flex-col px-4 py-3 border-b border-gray-100 active:bg-gray-50 transition-colors relative ${isOutOfStock ? 'opacity-80' : ''}`}>
       <div className="flex items-center gap-3">
         {/* Thumbnail */}
         <div className="w-14 h-14 rounded-xl flex-shrink-0 bg-gray-50 overflow-hidden relative border border-gray-100">
@@ -69,6 +72,11 @@ export default function ProductListItem({ product }) {
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <span className="text-2xl select-none">{product.emoji || "🍽️"}</span>
+            </div>
+          )}
+          {isOutOfStock && (
+            <div className="absolute bottom-0 inset-x-0 bg-red-500/90 backdrop-blur-sm text-white text-[8px] font-black uppercase tracking-widest text-center py-0.5">
+              Sold Out
             </div>
           )}
         </div>
@@ -110,7 +118,11 @@ export default function ProductListItem({ product }) {
 
         {/* Controls */}
         <div className="flex-shrink-0">
-          {hasPortions ? (
+          {isOutOfStock ? (
+             <div className="bg-gray-100 text-gray-400 text-[10px] font-bold px-2.5 py-1.5 rounded-lg border border-gray-200">
+               Sold Out
+             </div>
+          ) : hasPortions ? (
             <button
               onClick={() => setPickerOpen((prev) => !prev)}
               className="flex items-center gap-1 border-2 border-purple-500 rounded-xl text-purple-600 px-2.5 h-8 text-[11px] font-bold active:bg-purple-50 transition-colors"
@@ -132,8 +144,11 @@ export default function ProductListItem({ product }) {
                 {flatCartItem.quantity}
               </span>
               <button
-                onClick={() => updateQuantity(product.id, 1)}
-                className="w-8 h-8 flex items-center justify-center bg-green-500 text-white active:bg-green-600 transition-colors"
+                onClick={() => {
+                  if (flatCartItem.quantity < stockCount) updateQuantity(product.id, 1);
+                }}
+                disabled={flatCartItem.quantity >= stockCount}
+                className="w-8 h-8 flex items-center justify-center bg-green-500 text-white active:bg-green-600 transition-colors disabled:opacity-50 disabled:bg-gray-400"
               >
                 <Plus size={13} strokeWidth={3} />
               </button>

@@ -21,6 +21,7 @@ import {
   Settings,
   Tag,
   Edit3,
+  PackageCheck
 } from "lucide-react";
 
 const ADMIN_PAGES = [
@@ -30,6 +31,13 @@ const ADMIN_PAGES = [
     label: "Orders Dashboard",
     desc: "View & manage customer orders in real-time",
     color: "from-green-500 to-emerald-600",
+  },
+  {
+    href: "/admin/stock",
+    icon: PackageCheck,
+    label: "Stock Management",
+    desc: "Quickly manage stock levels & mark out-of-stock items",
+    color: "from-blue-500 to-indigo-500",
   },
   {
     href: "/admin/products",

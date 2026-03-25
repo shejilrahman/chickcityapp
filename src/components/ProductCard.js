@@ -57,8 +57,11 @@ export default function ProductCard({ product }) {
     (rt) => product.portionSlab?.[rt.key]
   );
 
+  const stockCount = product.stockCount !== undefined ? product.stockCount : 999;
+  const isOutOfStock = stockCount <= 0;
+
   return (
-    <div className="bg-white rounded-xl border border-purple-50 overflow-hidden flex flex-col card-shadow relative">
+    <div className={`bg-white rounded-xl border border-purple-50 overflow-hidden flex flex-col card-shadow relative ${isOutOfStock ? 'opacity-80' : ''}`}>
       {/* Image */}
       <div className="relative w-full bg-gray-50" style={{ paddingBottom: "100%" }}>
         {product.image ? (
@@ -77,13 +80,20 @@ export default function ProductCard({ product }) {
         )}
 
         {/* Cart badge */}
-        {(flatCartItem || totalPortionQty > 0) && (
+        {!isOutOfStock && (flatCartItem || totalPortionQty > 0) && (
           <span
             className="absolute top-1.5 right-1.5 text-[10px] font-bold px-1.5 h-4 rounded-full flex items-center justify-center"
             style={{ background: "#7c3aed", color: "white" }}
           >
             {flatCartItem ? flatCartItem.quantity : totalPortionQty}
           </span>
+        )}
+
+        {/* Out of Stock badge */}
+        {isOutOfStock && (
+          <div className="absolute top-2 left-2 bg-red-500/90 backdrop-blur-sm text-white text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded shadow-sm">
+            Sold Out
+          </div>
         )}
       </div>
 
@@ -131,7 +141,11 @@ export default function ProductCard({ product }) {
           </div>
 
           {/* Add button / stepper */}
-          {hasPortions ? (
+          {isOutOfStock ? (
+            <div className="bg-gray-100 text-gray-400 text-[10px] font-bold px-2 py-1 rounded-lg border border-gray-200">
+              Not Available
+            </div>
+          ) : hasPortions ? (
             <button
               onClick={() => setPickerOpen(true)}
               className="flex items-center gap-0.5 border-2 border-purple-500 rounded-lg text-purple-600 px-2 h-7 text-[11px] font-bold active:bg-purple-50 transition-colors"
@@ -153,8 +167,11 @@ export default function ProductCard({ product }) {
                 {flatCartItem.quantity}
               </span>
               <button
-                onClick={() => updateQuantity(product.id, 1)}
-                className="w-7 h-7 flex items-center justify-center bg-purple-600 text-white active:bg-purple-700 transition-colors"
+                onClick={() => {
+                  if (flatCartItem.quantity < stockCount) updateQuantity(product.id, 1);
+                }}
+                disabled={flatCartItem.quantity >= stockCount}
+                className="w-7 h-7 flex items-center justify-center bg-purple-600 text-white active:bg-purple-700 transition-colors disabled:opacity-50 disabled:bg-gray-400"
               >
                 <Plus size={12} strokeWidth={3} />
               </button>

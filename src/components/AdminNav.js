@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Image as ImageIcon, FolderOpen, Star, Scale, EyeOff, LayoutDashboard, Edit3, ShoppingBag, Settings, Tag } from "lucide-react";
+import { Image as ImageIcon, FolderOpen, Star, Scale, EyeOff, LayoutDashboard, Edit3, ShoppingBag, Settings, Tag, PackageCheck } from "lucide-react";
 
 const links = [
   { href: "/admin",              icon: LayoutDashboard, label: "Home" },
   { href: "/admin/dashboard",    icon: LayoutDashboard, label: "Orders" },
+  { href: "/admin/stock",        icon: PackageCheck,    label: "Stock" },
   { href: "/admin/products",     icon: ShoppingBag,     label: "Products" },
   { href: "/admin/categories",   icon: FolderOpen,      label: "Categories" },
   { href: "/admin/settings",     icon: Settings,        label: "Settings" },

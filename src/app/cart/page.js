@@ -323,12 +323,12 @@ export default function CartPage() {
           <div className="grid grid-cols-2 gap-3">
             <button
               onClick={() => setPaymentMethod("upi")}
-              className={`relative p-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 ${paymentMethod === 'upi' ? 'border-[#070e38] bg-[#070e38]/5' : 'border-gray-50 bg-gray-50/50 grayscale'}`}
+              className={`relative p-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 ${paymentMethod === 'upi' ? 'border-[#c9a227] bg-[#fef8e7]' : 'border-gray-50 bg-gray-50/50 grayscale'}`}
             >
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${paymentMethod === 'upi' ? 'bg-[#070e38] text-white' : 'bg-white text-gray-300'}`}>
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${paymentMethod === 'upi' ? 'bg-[#c9a227] text-white' : 'bg-white text-gray-300'}`}>
                 <QrCode size={20} />
               </div>
-              <p className={`font-black text-[12px] ${paymentMethod === 'upi' ? 'text-[#070e38]' : 'text-gray-400'}`}>Instant UPI</p>
+              <p className={`font-black text-[12px] ${paymentMethod === 'upi' ? 'text-[#8b6e15]' : 'text-gray-400'}`}>Instant UPI</p>
               {paymentMethod === 'upi' && (
                 <div className="absolute top-2 right-2 flex gap-1">
                   <div className="w-1.5 h-1.5 bg-[#c9a227] rounded-full animate-pulse" />

@@ -343,7 +343,7 @@ export default function CartPage() {
               <div className={`w-10 h-10 rounded-full flex items-center justify-center ${paymentMethod === 'whatsapp' ? 'bg-emerald-600 text-white' : 'bg-white text-gray-300'}`}>
                 <Banknote size={20} />
               </div>
-              <p className={`font-black text-[12px] ${paymentMethod === 'whatsapp' ? 'text-emerald-700' : 'text-gray-400'}`}>Pay on Delivery</p>
+              <p className={`font-black text-[12px] ${paymentMethod === 'whatsapp' ? 'text-emerald-700' : 'text-gray-400'}`}>Cash on Delivery</p>
               {paymentMethod === 'whatsapp' && (
                 <div className="absolute top-2 right-2">
                   <CheckCircle2 size={14} className="text-emerald-600" />

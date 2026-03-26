@@ -145,7 +145,7 @@ export default function CartPage() {
         </div>
         <h2 className="text-2xl font-black text-[#070e38] mb-3">Your cart is empty</h2>
         <p className="text-gray-500 mb-10 max-w-[280px] text-sm leading-relaxed">
-          Good food is always just a few clicks away! Let's find something delicious for you.
+          Good food is always just a few clicks away! Let&apos;s find something delicious for you.
         </p>
         <button
           onClick={() => router.push("/")}

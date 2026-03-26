@@ -370,7 +370,7 @@ export default function CartPage() {
             {isSubmitting ? (
               <Loader2 className="animate-spin w-5 h-5" />
             ) : paymentMethod === 'upi' ? (
-              <>Pay & Place Order</>
+              <>Pay &amp; Place Order</>
             ) : (
               <>Place Order</>
             )}

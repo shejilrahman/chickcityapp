@@ -13,6 +13,7 @@ export default function AppShell({ children }) {
   
   const isAdmin = pathname?.startsWith("/admin");
   const isOfflinePage = pathname === "/offline";
+  const isCartPage = pathname === "/cart";
 
   useEffect(() => {
     // Check sessionStorage so splash only shows ONCE per browser session
@@ -43,10 +44,10 @@ export default function AppShell({ children }) {
       ) : (
         <div className="min-h-screen bg-slate-50 flex flex-col items-center">
           <div className="w-full max-w-md min-h-screen bg-white shadow-[0_0_60px_rgba(0,0,0,0.08)] relative flex flex-col">
-            <div className={!isOfflinePage ? "flex-1 pb-16" : "flex-1"}>
+            <div className={(!isOfflinePage && !isCartPage) ? "flex-1 pb-16" : "flex-1"}>
               {children}
             </div>
-            {!isOfflinePage && <BottomNav />}
+            {!isOfflinePage && !isCartPage && <BottomNav />}
             <InstallPrompt />
           </div>
         </div>

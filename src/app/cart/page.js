@@ -5,6 +5,7 @@ import { useCart } from "@/components/CartContext";
 import { ArrowLeft, Trash2, Plus, Minus, Send, MapPin, Loader2, ShoppingBag, Lock, AlertTriangle, QrCode, Banknote, CheckCircle2 } from "lucide-react";
 import Image from "next/image";
 import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
 
 const MapPicker = dynamic(() => import("@/components/MapPicker"), { ssr: false });
 

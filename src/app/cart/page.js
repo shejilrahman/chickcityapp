@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useCart } from "@/components/CartContext";
 import { generateWhatsAppMessage } from "@/lib/whatsapp";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Trash2, Plus, Minus, Send, MapPin, Loader2, ShoppingBag, Lock, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Trash2, Plus, Minus, Send, MapPin, Loader2, ShoppingBag, Lock, AlertTriangle, QrCode, Banknote } from "lucide-react";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 
@@ -26,7 +26,7 @@ export default function CartPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
   const [showMap, setShowMap] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState("whatsapp"); // "whatsapp" | "gpay"
+  const [paymentMethod, setPaymentMethod] = useState("upi"); // "whatsapp" | "upi"
 
   useEffect(() => {
     const savedDetails = localStorage.getItem("restaurant-customer");
@@ -104,14 +104,14 @@ export default function CartPage() {
           : (item.unit || ""),
       }));
 
-      if (paymentMethod === "gpay") {
+      if (paymentMethod === "upi") {
         const upiId = process.env.NEXT_PUBLIC_UPI_ID || "8089551181@ybl";
         const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(process.env.NEXT_PUBLIC_SHOP_NAME || "Noor al Mandi")}&am=${totalPrice}&cu=INR&tn=${encodeURIComponent(`Order #${data.orderId.slice(-6)}`)}`;
         window.location.href = upiUrl;
         
         // Also send WhatsApp after a brief delay so they have the confirmation text
         setTimeout(() => {
-          const url = generateWhatsAppMessage(waItems, totalPrice, name, phone, location, landmark, "Paid via Google Pay");
+          const url = generateWhatsAppMessage(waItems, totalPrice, name, phone, location, landmark, "Paid via UPI");
           window.open(url, "_blank");
           clearCart();
           router.push("/orders");
@@ -311,28 +311,21 @@ export default function CartPage() {
               <div className="grid grid-cols-2 gap-3">
                 <button
                   type="button"
-                  onClick={() => setPaymentMethod("whatsapp")}
-                  className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all ${paymentMethod === "whatsapp" ? "border-green-600 bg-green-50 text-green-700" : "border-gray-100 bg-white text-gray-500"}`}
+                  onClick={() => setPaymentMethod("upi")}
+                  className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all ${paymentMethod === "upi" ? "border-blue-600 bg-blue-50 text-blue-700" : "border-gray-100 bg-white text-gray-500"}`}
                 >
-                  <Send size={20} className="mb-1" />
-                  <span className="text-[13px] font-bold">WhatsApp Order</span>
-                  <span className="text-[10px] opacity-70">Pay on Delivery</span>
+                  <QrCode size={22} className="mb-1 text-blue-500" />
+                  <span className="text-[13px] font-bold mt-1">UPI Pay</span>
+                  <span className="text-[10px] opacity-70">Pay Instantly</span>
                 </button>
                 <button
                   type="button"
-                  onClick={() => setPaymentMethod("gpay")}
-                  className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all ${paymentMethod === "gpay" ? "border-blue-600 bg-blue-50 text-blue-700" : "border-gray-100 bg-white text-gray-500"}`}
+                  onClick={() => setPaymentMethod("whatsapp")}
+                  className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all ${paymentMethod === "whatsapp" ? "border-green-600 bg-green-50 text-green-700" : "border-gray-100 bg-white text-gray-500"}`}
                 >
-                  <div className="w-5 h-5 mb-1 flex items-center justify-center">
-                    <svg viewBox="0 0 40 40" className="w-full h-full">
-                      <path d="M33.07,17.42H20.31v5.44h7.36a6.3,6.3,0,0,1-2.72,4.14v3.45h4.39c2.57-2.37,4-5.85,4-9.89A12.42,12.42,0,0,1,33.07,17.42Z" fill="#4285f4" />
-                      <path d="M20.31,31.25a10.45,10.45,0,0,0,7.27-2.65l-4.39-3.45a6.57,6.57,0,0,1-9.76-3.46H9v3.52A12.5,12.5,0,0,0,20.31,31.25Z" fill="#34a853" />
-                      <path d="M13.43,21.69a7.61,7.61,0,0,1,0-4.88V13.29H9a12.5,12.5,0,0,0,0,11.92Z" fill="#fbbc04" />
-                      <path d="M20.31,10.43a6.83,6.83,0,0,1,4.83,1.89l3.63-3.61A12.35,12.35,0,0,0,20.31,5,12.5,12.5,0,0,0,9,13.29l4.43,3.52A6.57,6.57,0,0,1,20.31,10.43Z" fill="#ea4335" />
-                    </svg>
-                  </div>
-                  <span className="text-[13px] font-bold">Google Pay</span>
-                  <span className="text-[10px] opacity-70">Pay Instantly</span>
+                  <Banknote size={22} className="mb-1 text-green-600" />
+                  <span className="text-[13px] font-bold mt-1">Pay on Delivery</span>
+                  <span className="text-[10px] opacity-70">Cash / UPI</span>
                 </button>
               </div>
             </div>
@@ -340,22 +333,26 @@ export default function CartPage() {
             <button
               type="submit"
               disabled={isSubmitting || !name || !phone || !location || totalPrice < MIN_ORDER}
-              className={`w-full text-white rounded-2xl font-black text-[16px] flex items-center justify-center gap-2.5 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg mt-4 ${paymentMethod === 'gpay' ? 'bg-blue-600 shadow-blue-600/20' : 'bg-gray-900 shadow-gray-900/20'}`}
+              className={`w-full text-white rounded-2xl font-black text-[16px] flex items-center justify-center gap-2.5 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg mt-4 ${paymentMethod === 'upi' ? 'bg-blue-600 shadow-blue-600/20' : 'bg-gray-900 shadow-gray-900/20'}`}
               style={{ paddingTop: "1.125rem", paddingBottom: "1.125rem" }}
             >
               {isSubmitting ? (
                 <><Loader2 size={20} className="animate-spin" /> Processing...</>
               ) : totalPrice < MIN_ORDER ? (
                 <><Lock size={18} /> Min. ₹{MIN_ORDER} Required</>
-              ) : paymentMethod === 'gpay' ? (
-                <>Pay ₹{totalPrice} with Google Pay</>
+              ) : paymentMethod === 'upi' ? (
+                <><QrCode size={18} /> Pay ₹{totalPrice} with UPI</>
               ) : (
-                <><Send size={18} /> Order on WhatsApp</>
+                <><Banknote size={18} /> Order as Pay on Delivery</>
               )}
             </button>
-            <p className="text-center text-xs text-gray-400 pb-4">
-              You&apos;ll be redirected to WhatsApp to confirm your order.
-            </p>
+            
+            <div className="bg-blue-50 border border-blue-100 rounded-xl p-3 flex items-start gap-2.5 mt-2">
+              <Send size={16} className="text-blue-500 flex-shrink-0 mt-0.5" />
+              <p className="text-xs text-blue-800 leading-relaxed font-medium">
+                We use WhatsApp for our order system! After {paymentMethod === 'upi' ? 'paying' : 'submitting'}, you&apos;ll be securely redirected to WhatsApp where your order ticket will be generated automatically.
+              </p>
+            </div>
           </form>
         ) : (
           <div className="bg-white rounded-2xl p-6 flex items-center justify-center animate-pulse h-48">

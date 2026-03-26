@@ -151,7 +151,7 @@ export default function CartPage() {
           onClick={() => router.push("/")}
           className="bg-[#070e38] text-white px-10 py-4 rounded-2xl font-black text-[15px] shadow-2xl shadow-blue-900/20 active:scale-[0.98] transition-all"
         >
-          Browse Restaurants
+          Browse Menu
         </button>
       </div>
     );

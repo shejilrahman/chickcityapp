@@ -2,9 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useCart } from "@/components/CartContext";
-import { generateWhatsAppMessage } from "@/lib/whatsapp";
-import { useRouter } from "next/navigation";
-import { ArrowLeft, Trash2, Plus, Minus, Send, MapPin, Loader2, ShoppingBag, Lock, AlertTriangle, QrCode, Banknote } from "lucide-react";
+import { ArrowLeft, Trash2, Plus, Minus, Send, MapPin, Loader2, ShoppingBag, Lock, AlertTriangle, QrCode, Banknote, CheckCircle2 } from "lucide-react";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 
@@ -94,33 +92,23 @@ export default function CartPage() {
       const pastOrders = JSON.parse(localStorage.getItem("restaurant-orders") || "[]");
       localStorage.setItem("restaurant-orders", JSON.stringify([...pastOrders, data.orderId]));
 
-      // Build items for WhatsApp using cartKey-aware structure
-      const waItems = cart.map((item) => ({
-        name: item.name,
-        price: item.portionPrice ?? item.price,
-        quantity: item.quantity,
-        unit: item.portion
-          ? `${PORTION_LABELS[item.portion] ?? item.portion} · ${RICE_LABELS[item.riceType] ?? item.riceType}`
-          : (item.unit || ""),
-      }));
-
       if (paymentMethod === "upi") {
         const upiId = process.env.NEXT_PUBLIC_UPI_ID || "8089551181@ybl";
         const upiUrl = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(process.env.NEXT_PUBLIC_SHOP_NAME || "Noor al Mandi")}&am=${totalPrice}&cu=INR&tn=${encodeURIComponent(`Order #${data.orderId.slice(-6)}`)}`;
+        
+        // Clear cart first before any potential navigation
+        clearCart();
+        
+        // Attempt to open UPI app
         window.location.href = upiUrl;
         
-        // Also send WhatsApp after a brief delay so they have the confirmation text
+        // Go to orders page after a slight delay
         setTimeout(() => {
-          const url = generateWhatsAppMessage(waItems, totalPrice, name, phone, location, landmark, "Paid via UPI");
-          window.open(url, "_blank");
-          clearCart();
           router.push("/orders");
-        }, 3000);
+        }, 1500);
       } else {
         clearCart();
         router.push("/orders");
-        const url = generateWhatsAppMessage(waItems, totalPrice, name, phone, location, landmark);
-        window.open(url, "_blank");
       }
     } catch (error) {
       console.error("Order failed:", error);
@@ -321,11 +309,16 @@ export default function CartPage() {
                 <button
                   type="button"
                   onClick={() => setPaymentMethod("whatsapp")}
-                  className={`flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all ${paymentMethod === "whatsapp" ? "border-green-600 bg-green-50 text-green-700" : "border-gray-100 bg-white text-gray-500"}`}
+                  className={`relative overflow-hidden flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all ${paymentMethod === "whatsapp" ? "border-emerald-500 bg-gradient-to-br from-emerald-50 to-teal-100 text-emerald-800 shadow-sm" : "border-gray-100 bg-gray-50 text-gray-500 hover:bg-gray-100"}`}
                 >
-                  <Banknote size={22} className="mb-1 text-green-600" />
-                  <span className="text-[13px] font-bold mt-1">Pay on Delivery</span>
-                  <span className="text-[10px] opacity-70">Cash / UPI</span>
+                  {paymentMethod === "whatsapp" && (
+                    <div className="absolute top-2 right-2 text-emerald-500">
+                      <CheckCircle2 size={16} />
+                    </div>
+                  )}
+                  <Banknote size={22} className={`mb-1 ${paymentMethod === "whatsapp" ? "text-emerald-600" : "text-gray-400"}`} />
+                  <span className="text-[13px] font-bold mt-1">Cash on Delivery</span>
+                  <span className="text-[10px] opacity-70">Pay at Doorstep</span>
                 </button>
               </div>
             </div>
@@ -343,16 +336,9 @@ export default function CartPage() {
               ) : paymentMethod === 'upi' ? (
                 <><QrCode size={18} /> Pay ₹{totalPrice} with UPI</>
               ) : (
-                <><Banknote size={18} /> Order as Pay on Delivery</>
+                <><Banknote size={18} /> Place Order (COD)</>
               )}
             </button>
-            
-            <div className="bg-blue-50 border border-blue-100 rounded-xl p-3 flex items-start gap-2.5 mt-2">
-              <Send size={16} className="text-blue-500 flex-shrink-0 mt-0.5" />
-              <p className="text-xs text-blue-800 leading-relaxed font-medium">
-                We use WhatsApp for our order system! After {paymentMethod === 'upi' ? 'paying' : 'submitting'}, you&apos;ll be securely redirected to WhatsApp where your order ticket will be generated automatically.
-              </p>
-            </div>
           </form>
         ) : (
           <div className="bg-white rounded-2xl p-6 flex items-center justify-center animate-pulse h-48">

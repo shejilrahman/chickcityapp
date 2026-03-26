@@ -9,7 +9,7 @@ export async function GET() {
       // Return defaults
       return NextResponse.json({
         shopName: "Noor al Mandi",
-        whatsappNumber: "8891930562",
+        whatsappNumber: "8089551181",
         address: "",
         openingTime: "10:00",
         closingTime: "22:00",
